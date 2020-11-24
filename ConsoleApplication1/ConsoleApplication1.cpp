@@ -15,7 +15,13 @@
 PWSTR byteConv(const std::string*  pstr);
 PWSTR intConv(const std::string*  pstr);
 PWSTR longConv(const std::string*  pstr);
+/*
+HINSTANCE --> Handle (typlose Referenz) auf ein Fenster
+PWSTR --> Pointer to wide string | szCmdLine --> Konsolenparameter
+CmdShow --> bool 
 
+Diese main-function startet ohne ein kleines console-window, wie es bei int main(void) der Fall wäre
+*/
 int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 	PWSTR szCmdLine, int CmdShow) {
 	using std::string;
@@ -27,17 +33,21 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 	std::stringstream sstream;
 	sstream << "The screen size is: " << to_string(x) << " x " << y << " MAXBYTE: "<< MAXBYTE;
 	string str = sstream.str();
-
 	PWSTR pntr_wchar = byteConv(&str);
+	//Nachrichtenbox pausiert programmausführung bis Fenster geschlossen
+	// NULL --> bezieht sich nicht auf ein vorhandenes Fenster, ansonsten hier HINSTANCE einfügen
+	// pntr_wchar --> Text
+	// L"Title" --> Title
 	MessageBoxW(NULL, pntr_wchar , L"Title", MB_OK);
 
 	free(pntr_wchar);
+
 	return 0;
 }
 
 PWSTR byteConv(const std::string*  pstr) {
 	const char* c_str = (*pstr).c_str();
-	WCHAR* outp = (WCHAR*) malloc(sizeof(WCHAR)* (*pstr).length());
+	PWSTR outp = (PWSTR) calloc( (*pstr).length()+1, sizeof(WCHAR));
 	for (BYTE i = 0; i <= pstr->length() && i < MAXBYTE; i++) {
 		outp[i] = c_str[i];
 	}
