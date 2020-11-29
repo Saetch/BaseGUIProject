@@ -9,12 +9,20 @@
 #include <wchar.h>
 #include <string.h>
 #include <sstream>
+#include <Lmcons.h>
+#include <VersionHelpers.h>
 
 #pragma comment(lib, "user32.lib")
+
+
+
 
 PWSTR byteConv(const std::string*  pstr);
 PWSTR intConv(const std::string*  pstr);
 PWSTR longConv(const std::string*  pstr);
+
+PWSTR strToPWSTR(const char arr[], int len);
+PWSTR strToPWSTR(const wchar_t arr[], int len);
 /*
 HINSTANCE --> Handle (typlose Referenz) auf ein Fenster
 PWSTR --> Pointer to wide string | szCmdLine --> Konsolenparameter
@@ -31,7 +39,13 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 	int x = GetSystemMetrics(SM_CXSCREEN);
 	int y = GetSystemMetrics(SM_CYSCREEN);
 	std::stringstream sstream;
-	sstream << "The screen size is: " << to_string(x) << " x " << y << " MAXBYTE: "<< MAXBYTE;
+
+	wchar_t buf[MAX_PATH+1];
+	int r = GetCurrentDirectory(MAX_PATH + 1, buf);
+
+	MessageBoxW(NULL, strToPWSTR(buf, sizeof(buf)), strToPWSTR("CURRENT DIRECTORY:",19), MB_OK);
+
+	sstream << "The screen size is: " << to_string(x) << " x " << y << " USERNAME: ";
 	string str = sstream.str();
 	PWSTR pntr_wchar = byteConv(&str);
 	//Nachrichtenbox pausiert programmausführung bis Fenster geschlossen
@@ -56,7 +70,7 @@ PWSTR byteConv(const std::string*  pstr) {
 
 PWSTR intConv(const std::string*  pstr) {
 	const char* c_str = (*pstr).c_str();
-	WCHAR* outp = (WCHAR*)malloc(sizeof(WCHAR)*MAXBYTE);
+	WCHAR* outp = (WCHAR*)calloc( pstr->length()+1, sizeof(WCHAR));
 	for (unsigned int i = 0; i <= pstr->length() && i < MAXBYTE; i++) {
 		outp[i] = c_str[i];
 	}
@@ -65,11 +79,27 @@ PWSTR intConv(const std::string*  pstr) {
 
 PWSTR longConv(const std::string*  pstr) {
 	const char* c_str = (*pstr).c_str();
-	WCHAR* outp = (WCHAR*)malloc(sizeof(WCHAR)*MAXBYTE);
+	WCHAR* outp = (WCHAR*)calloc(pstr->length()+1, sizeof(WCHAR));
 	for (unsigned long i = 0; i <= pstr->length() && i < MAXBYTE; i++) {
 		outp[i] = c_str[i];
 	}
 	return outp;
+}
+
+PWSTR strToPWSTR(const char arr[], int len) {
+	WCHAR* ret = (WCHAR*)calloc(len , sizeof(WCHAR));
+	for (unsigned int i = 0; i < (unsigned int) len; i++) {
+		ret[i] = arr[i];
+	}
+	return ret;
+}
+
+PWSTR strToPWSTR(const wchar_t arr[], int len) {
+	WCHAR* ret = (WCHAR*)calloc(len, sizeof(WCHAR));
+	for (unsigned int i = 0; i < (unsigned int) len; i++) {
+		ret[i] = arr[i];
+	}
+	return ret;
 }
 
 
