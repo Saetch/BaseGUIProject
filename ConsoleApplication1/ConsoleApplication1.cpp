@@ -36,10 +36,12 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 	using std::to_string;
 
 
+	// +++++++++++++++++++++++++++++++++++++++++++++++++++ 1
+	
+
 	int x = GetSystemMetrics(SM_CXSCREEN);
 	int y = GetSystemMetrics(SM_CYSCREEN);
 	std::stringstream sstream;
-
 	sstream << "The screen size is: " << to_string(x) << " x " << y;
 	string str = sstream.str();
 	PWSTR pntr_wchar = byteConv(&str);
@@ -49,17 +51,50 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 	// L"Title" --> Title
 	MessageBoxW(NULL, pntr_wchar, L"Title", MB_OK);
 
+	free(pntr_wchar);
+
+
+	// ++++++++++++++++++++++++++++++++++++++++++++++++++++ 2
+
 
 	wchar_t buf[MAX_PATH+1];
 	int r = GetCurrentDirectory(MAX_PATH + 1, buf);
-	if (r == 0) return 0;
+	if (r == 0) return 1;
 	PWSTR pntr2 = strToPWSTR(buf, sizeof(buf));
 	r = MessageBoxW(NULL, pntr2 , L"CURRENT DIRECTORY:", MB_OK);
-	if (r == 0) return 0;
+	if (r == 0) return 1;
 
-	
 	free(pntr2);
-	free(pntr_wchar);
+	
+
+	// +++++++++++++++++++++++++++++++++++++++++++++++++++++ 3
+
+
+	//initialisiere array mit 0 -->  BSP: 	int arr[50] = { 0 };
+
+	MEMORYSTATUSEX mem = { 0 };
+
+	//pass own length (like array-length) to the structure, to keep it stored. Results in no int len variable being passed to GlobalMemoryStatusEx
+	mem.dwLength = sizeof(mem);
+
+	//store current memory information in the mem structure
+	r = GlobalMemoryStatusEx(&mem);
+	sstream.str("");
+	//clear only clears flags, etc. Should be called, when initializing the sstream anew
+	sstream.clear();
+	sstream << "Memory in use: " << mem.dwMemoryLoad << "percent\n"
+		<< "Total physical memory: " << mem.ullTotalPhys << "\n"
+		<< "Total free physical memory: " << mem.ullAvailPhys << "\n"
+		<< "Total virtual memory: " << mem.ullAvailVirtual << "\n"
+		<< "Free virtual memory: " << mem.ullAvailVirtual << "\n";
+	str = sstream.str();
+	PWSTR pntr3 = intConv(&str);
+
+	r = MessageBoxW(NULL, pntr3, L"Memory Usage:", MB_OK);
+	if (r == 0) return 1;
+
+	free(pntr3);
+
 
 	return 0;
 }
