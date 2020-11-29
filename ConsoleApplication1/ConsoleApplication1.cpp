@@ -40,19 +40,22 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 	int y = GetSystemMetrics(SM_CYSCREEN);
 	std::stringstream sstream;
 
-	wchar_t buf[MAX_PATH+1];
-	int r = GetCurrentDirectory(MAX_PATH + 1, buf);
-
-	MessageBoxW(NULL, strToPWSTR(buf, sizeof(buf)), strToPWSTR("CURRENT DIRECTORY:",19), MB_OK);
-
-	sstream << "The screen size is: " << to_string(x) << " x " << y << " USERNAME: ";
+	sstream << "The screen size is: " << to_string(x) << " x " << y;
 	string str = sstream.str();
 	PWSTR pntr_wchar = byteConv(&str);
 	//Nachrichtenbox pausiert programmausführung bis Fenster geschlossen
 	// NULL --> bezieht sich nicht auf ein vorhandenes Fenster, ansonsten hier HINSTANCE einfügen
 	// pntr_wchar --> Text
 	// L"Title" --> Title
-	MessageBoxW(NULL, pntr_wchar , L"Title", MB_OK);
+	MessageBoxW(NULL, pntr_wchar, L"Title", MB_OK);
+
+
+	wchar_t buf[MAX_PATH+1];
+	int r = GetCurrentDirectory(MAX_PATH + 1, buf);
+
+	MessageBoxW(NULL, strToPWSTR(buf, sizeof(buf)), L"CURRENT DIRECTORY:", MB_OK);
+
+	
 
 	free(pntr_wchar);
 
