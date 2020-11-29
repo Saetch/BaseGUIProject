@@ -52,11 +52,13 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 
 	wchar_t buf[MAX_PATH+1];
 	int r = GetCurrentDirectory(MAX_PATH + 1, buf);
-
-	MessageBoxW(NULL, strToPWSTR(buf, sizeof(buf)), L"CURRENT DIRECTORY:", MB_OK);
+	if (r == 0) return 0;
+	PWSTR pntr2 = strToPWSTR(buf, sizeof(buf));
+	r = MessageBoxW(NULL, pntr2 , L"CURRENT DIRECTORY:", MB_OK);
+	if (r == 0) return 0;
 
 	
-
+	free(pntr2);
 	free(pntr_wchar);
 
 	return 0;
