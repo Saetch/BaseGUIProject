@@ -12,10 +12,15 @@
 #include <Lmcons.h>
 #include <VersionHelpers.h>
 
+#include "SingleLinkedList.h"
+//we can't add a SingleLinkedList.cpp file and include that, because a template can't be instantiated at compile time, so the compiler can't access the implementation
+//anymore when creating an object
+#include "SingleLinkedList_impl.h"
+
 #pragma comment(lib, "user32.lib")
 
 
-
+//HEAD
 
 PWSTR byteConv(const std::string*  pstr);
 PWSTR intConv(const std::string*  pstr);
@@ -23,6 +28,10 @@ PWSTR longConv(const std::string*  pstr);
 
 PWSTR strToPWSTR(const char arr[], int len);
 PWSTR strToPWSTR(const wchar_t arr[], int len);
+
+//ENDHEAD
+
+
 /*
 HINSTANCE --> Handle (typlose Referenz) auf ein Fenster
 PWSTR --> Pointer to wide string | szCmdLine --> Konsolenparameter
@@ -94,6 +103,29 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 	if (r == 0) return 1;
 
 	free(pntr3);
+
+
+	// +++++++++++++++++++++++++++++++++++++++++++++++++++++++ 4
+
+	SingleLinkedList<int>* list = new SingleLinkedList<int>();
+	for (int i = 0; i < 300; i = i + 2) {
+		int* elem = new int(i);
+		list->pushBack(elem);
+	}
+
+	str = list->to_string();
+	PWSTR pntr4 = intConv(&str);
+
+	r = MessageBoxW(NULL, pntr4, L"List: ", MB_OK);
+
+
+	if (r == 0) return 1;
+
+
+
+	
+
+
 
 
 	return 0;
