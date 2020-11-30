@@ -116,3 +116,60 @@ T SingleLinkedList<T>::getP(unsigned int index) {
 	}
 	return cur->element;
 }
+
+template <typename T>
+int SingleLinkedList<T>::removeElement(unsigned int index) {
+	ListElem* ptr = firstElement;
+	if (index == 0) {
+		firstElement = firstElement->next;
+		
+	}
+	else {
+		ListElem* ptr2;
+		for (unsigned int i = 0; i < index - 1; i++) {
+			ptr = ptr->next;
+		}
+
+		ptr2 = ptr;
+		ptr = ptr2->next;
+		if (index == size - 1) {
+			lastElement = ptr2;
+		}
+		ptr2->next = ptr->next;
+	}
+	free(ptr);
+	size--;
+	if (size == 0) {
+		firstElement = NULL;
+		lastElement = NULL;
+	}
+	return 0;
+	
+}
+
+template <typename T>
+int SingleLinkedList<T>::removeAndFreeElem(unsigned int index) {
+	ListElem<T>* ptr = firstElement;
+	if (index == 0) {
+		firstElement = firstElement->next;
+
+	}
+	else {
+		ListElem<T>* ptr2;
+		for (unsigned int i = 0; i < index - 1; i++) {
+			ptr = ptr->next;
+		}
+		ptr2 = ptr;
+		ptr = ptr2->next;
+		ptr2->next = ptr->next;
+	}
+	free(ptr->element);
+	free(ptr);
+	size--;
+	if (size == 0) {
+		firstElement = NULL;
+		lastElement = NULL;
+	}
+	return 0;
+
+}

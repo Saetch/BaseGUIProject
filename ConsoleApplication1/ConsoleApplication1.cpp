@@ -11,6 +11,7 @@
 #include <sstream>
 #include <Lmcons.h>
 #include <VersionHelpers.h>
+#include <time.h>
 
 #include "SingleLinkedList.h"
 //we can't add a SingleLinkedList.cpp file and include that, because a template can't be instantiated at compile time, so the compiler can't access the implementation
@@ -43,6 +44,7 @@ int main(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 	PWSTR szCmdLine, int CmdShow) {
 	using std::string;
 	using std::to_string;
+	srand((unsigned int)time(0));
 
 
 	// +++++++++++++++++++++++++++++++++++++++++++++++++++ 1
@@ -107,17 +109,57 @@ int main(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 
 	// +++++++++++++++++++++++++++++++++++++++++++++++++++++++ 4
 
+
+	//check debugger for memory leaks, just fill with bunch of stuff, delete and repeat, also check GetTickCount for speed performance
 	SingleLinkedList<int>* list = new SingleLinkedList<int>();
-	for (int i = 0; i < 100; i = i + 2) {
-		int* elem = new int(i);
+	DWORD start;
+	DWORD end;
+	DWORD res;
+	int result[1000] = { 0 };
+
+	for (int c = 0; c < 500; c++) {
+		start = GetTickCount();
+		for (int i = 0; i < 10000; i = i + 2) {
+			int* elem = new int(rand()); 
+			list->pushBack(elem);
+		}
+
+		while (list->getSize() > 0) {
+			list->removeAndFreeElem(0);
+		}
+		end = GetTickCount();
+		res = end - start;
+		for (int j = 0; j < 1000; j++) {
+			if (j == res) {
+				result[j]++;
+				break;
+			}
+		}
+	}
+
+	for (int i = 0; i < 1000; i++) {
+		if (result[i] != 0) {
+			printf_s("%d -> %d\n", i, result[i]);
+		}
+	}
+	
+
+	//fülle mit ein paar Daten, die man anzeigen lassen kann
+	for (int i = 0; i < 50; i = i ++ ) {
+		int* elem = new int(rand()%100);
 		list->pushBack(elem);
 	}
 
+
+	//zeige Liste
 	str = list->to_string();
 	PWSTR pntr4 = intConv(&str);
-
 	r = MessageBoxW(NULL, pntr4, L"List: ", MB_OK);
 
+	//und löschen
+	while (list->getSize() > 0) {
+		list->removeAndFreeElem(0);
+	}
 
 	if (r == 0) return 1;
 
@@ -126,6 +168,7 @@ int main(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 	
 
 	printf_s("Debug here\n");
+	//system("pause") ist kein netter system-call, aber funktioniert hier erstmal
 	system("pause");
 
 	return 0;

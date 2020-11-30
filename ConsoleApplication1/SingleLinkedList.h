@@ -36,6 +36,11 @@ public:
 
 	T getP(unsigned int index);
 
+	int removeElement(unsigned int index);
+
+	int removeAndFreeElem(unsigned int index);
+
+
 
 
 
