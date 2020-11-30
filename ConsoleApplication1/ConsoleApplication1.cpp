@@ -37,9 +37,9 @@ HINSTANCE --> Handle (typlose Referenz) auf ein Fenster
 PWSTR --> Pointer to wide string | szCmdLine --> Konsolenparameter
 CmdShow --> bool 
 
-Diese main-function startet ohne ein kleines console-window, wie es bei int main(void) der Fall wäre
+int WINAPI wWinMain -> Diese main-function startet ohne ein kleines console-window, wie es bei int main(void) der Fall wäre
 */
-int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
+int main(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 	PWSTR szCmdLine, int CmdShow) {
 	using std::string;
 	using std::to_string;
@@ -108,7 +108,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 	// +++++++++++++++++++++++++++++++++++++++++++++++++++++++ 4
 
 	SingleLinkedList<int>* list = new SingleLinkedList<int>();
-	for (int i = 0; i < 300; i = i + 2) {
+	for (int i = 0; i < 100; i = i + 2) {
 		int* elem = new int(i);
 		list->pushBack(elem);
 	}
@@ -125,8 +125,8 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 
 	
 
-
-
+	printf_s("Debug here\n");
+	system("pause");
 
 	return 0;
 }
