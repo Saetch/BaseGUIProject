@@ -37,7 +37,7 @@ HINSTANCE --> Handle (typlose Referenz) auf ein Fenster
 PWSTR --> Pointer to wide string | szCmdLine --> Konsolenparameter
 CmdShow --> bool 
 
-int WINAPI wWinMain -> Diese main-function startet ohne ein kleines console-window, wie es bei int main(void) der Fall wäre
+int WINAPI wWinMain -> Diese main-function startet ohne ein kleines console-window, wie es bei int main() der Fall ist
 */
 int main(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 	PWSTR szCmdLine, int CmdShow) {
