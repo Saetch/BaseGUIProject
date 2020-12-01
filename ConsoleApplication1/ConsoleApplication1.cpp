@@ -30,15 +30,20 @@ PWSTR longConv(const std::string*  pstr);
 PWSTR strToPWSTR(const char arr[], int len);
 PWSTR strToPWSTR(const wchar_t arr[], int len);
 
+//window procedure, to dispatch messsages to a window
+LRESULT CALLBACK WndProc(HWND hwnd, UINT msg,
+	WPARAM wParam, LPARAM lParam);
 //ENDHEAD
 
 
 /*
 HINSTANCE --> Handle (typlose Referenz) auf ein Fenster
+hPrevInstance ist immer NULL, Legacy-Referenz für 16 bit-Systeme
 PWSTR --> Pointer to wide string | szCmdLine --> Konsolenparameter
-CmdShow --> bool 
+CmdShow --> minimized, maximized, hidden 
 
 int WINAPI wWinMain -> Diese main-function startet ohne ein kleines console-window, wie es bei int main() der Fall ist
+die wWinMain function terminiert, wenn sie die WM_QUIT - Nachricht erhält
 */
 int main(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 	PWSTR szCmdLine, int CmdShow) {
@@ -65,7 +70,7 @@ int main(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 	free(pntr_wchar);
 
 
-	// ++++++++++++++++++++++++++++++++++++++++++++++++++++ 2
+	// ++++++++++++++++++++++++++++++++++++++++++++++++++++ 2  derzeitiges
 
 
 	wchar_t buf[MAX_PATH+1];
@@ -78,7 +83,7 @@ int main(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 	free(pntr2);
 	
 
-	// +++++++++++++++++++++++++++++++++++++++++++++++++++++ 3
+	// +++++++++++++++++++++++++++++++++++++++++++++++++++++ 3  Speicherauslastung
 
 
 	//initialisiere array mit 0 -->  BSP: 	int arr[50] = { 0 };
@@ -107,7 +112,7 @@ int main(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 	free(pntr3);
 
 
-	// +++++++++++++++++++++++++++++++++++++++++++++++++++++++ 4
+	// +++++++++++++++++++++++++++++++++++++++++++++++++++++++ 4 eigene Listklasse benutzen/Testen
 
 
 	//check debugger for memory leaks, just fill with bunch of stuff, delete and repeat, also check GetTickCount for speed performance
@@ -168,10 +173,56 @@ int main(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 	
 
 	printf_s("Debug here\n");
-	//system("pause") ist kein netter system-call, aber funktioniert hier erstmal
+	//system("pause") ist kein netter system-call, aber funktioniert hier erstmal, um User nach input zu fragen, bis man fort fährt
 	system("pause");
+	
+	//++++++++++++++++++++++++++++++++++++++++++++++++  5  NEUES FENSTER
 
-	return 0;
+
+	//variable, um Nachrichten zu holen
+	MSG  msg;
+	//handle zum Fenster, das wir öffnen wollen
+	HWND hwnd;
+	//Fenster-Klasse. Hier kommt Konfiguration rein, damit windows weiß, wie wir das Fenster haben wollen
+	//davon können mehrere erstellt werden. Es ist NICHT ein Fenster, es ist die Vorlage für ein Fenster
+	WNDCLASSW wc;
+	//zeichne neu, wenn bewegt oder verändert
+	wc.style = CS_HREDRAW | CS_VREDRAW;
+	//Unterklassen-Values
+	wc.cbClsExtra = 0;
+	wc.cbWndExtra = 0;
+	//Name
+	wc.lpszClassName = L"Window";
+	//handle-Instanz, aus main
+	wc.hInstance = hInstance;
+	//Hintergrund-Färben
+	wc.hbrBackground = GetSysColorBrush(COLOR_3DFACE);
+	//kein Menü
+	wc.lpszMenuName = NULL;
+	//function-pointer für message-callback procedure = unsere unten definierte Function
+	wc.lpfnWndProc = WndProc;
+	//Mauszeiger auf default
+	wc.hCursor = LoadCursor(NULL, IDC_ARROW);
+	//Fenster Icon default
+	wc.hIcon = LoadIcon(NULL, IDI_APPLICATION);
+	//Fenster registrieren, damit das OS damit kommunizieren und es anzeigen kann
+	RegisterClassW(&wc);
+	//Fenster erstellen mit Werten: wc.lpszClassName sorgt dafür, dass unsere Fenster-Vorlage benutzt wird, Referenz auf dieses Fenster
+	//wird dann in hwnd gespeichert (handle)
+	hwnd = CreateWindowW(wc.lpszClassName, L"Window",
+		WS_OVERLAPPEDWINDOW | WS_VISIBLE,
+		100, 100, 350, 250, NULL, NULL, hInstance, NULL);
+	//Fenster zeigen
+	ShowWindow(hwnd, CmdShow);
+	UpdateWindow(hwnd);
+
+	//hole Nachricht für das Fenster aus dem Message-Buffer
+	while (GetMessage(&msg, NULL, 0, 0)) {
+
+		DispatchMessage(&msg);
+	}
+
+	return (int)msg.wParam;
 }
 
 PWSTR byteConv(const std::string*  pstr) {
@@ -217,6 +268,19 @@ PWSTR strToPWSTR(const wchar_t arr[], int len) {
 	return ret;
 }
 
+
+LRESULT CALLBACK WndProc(HWND hwnd, UINT msg,
+	WPARAM wParam, LPARAM lParam) {
+
+	switch (msg) {
+
+	case WM_DESTROY:
+
+		PostQuitMessage(0);
+		break;
+	}
+	return DefWindowProcW(hwnd, msg, wParam, lParam);
+}
 
 
 
