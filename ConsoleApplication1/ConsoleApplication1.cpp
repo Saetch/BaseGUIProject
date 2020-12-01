@@ -44,6 +44,9 @@ CmdShow --> minimized, maximized, hidden
 
 int WINAPI wWinMain -> Diese main-function startet ohne ein kleines console-window, wie es bei int main() der Fall ist
 die wWinMain function terminiert, wenn sie die WM_QUIT - Nachricht erhält
+
+
+PS: für int WINAPI wWinMain bei Einstellungen->Settings->Linker->System->Subsystem nicht festgelegt einstellen, da ansonsten der Einstiegspunkt für spezialisierte, meist Konsolenanwendungen gewählt wird
 */
 int main(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 	PWSTR szCmdLine, int CmdShow) {
