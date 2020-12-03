@@ -18,14 +18,16 @@
 //anymore when creating an object
 #include "SingleLinkedList_impl.h"
 
+
+
 #pragma comment(lib, "user32.lib")
-
-
+//HEAD
+#define SHOW_UNNECESSARIES 0
 void showFirstBox();
 int showSecondBoxDirectory();
 int showThirdBoxMemory();
 int showFourthBoxAndCheckListForFunctionality();
-//HEAD
+
 
 PWSTR byteConv(const std::string*  pstr);
 PWSTR intConv(const std::string*  pstr);
@@ -37,6 +39,8 @@ PWSTR strToPWSTR(const wchar_t arr[], int len);
 //window procedure, to dispatch messsages to a window
 LRESULT CALLBACK WndProc(HWND hwnd, UINT msg,
 	WPARAM wParam, LPARAM lParam);
+void CenterWindow(HWND hwnd);
+
 //ENDHEAD
 
 
@@ -58,49 +62,19 @@ int main(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 	using std::to_string;
 	srand((unsigned int)time(0));
 
-
-	// +++++++++++++++++++++++++++++++++++++++++++++++++++ 1
-
-
-
-	showFirstBox();
-
-	
-
-
-	// ++++++++++++++++++++++++++++++++++++++++++++++++++++ 2  derzeitiges
-
-
-
-
-	showSecondBoxDirectory();
-
-
-	
-
-	// +++++++++++++++++++++++++++++++++++++++++++++++++++++ 3  Speicherauslastung
-
-
-
-
-	showThirdBoxMemory();
-	
-
-
-	// +++++++++++++++++++++++++++++++++++++++++++++++++++++++ 4 eigene Listklasse benutzen/Testen
-
-
-	
-
-	showFourthBoxAndCheckListForFunctionality();
-
-
-	
-
-	printf_s("Debug here\n");
-	//system("pause") ist kein netter system-call, aber funktioniert hier erstmal, um User nach input zu fragen, bis man fort fährt
-	system("pause");
-	
+	if (SHOW_UNNECESSARIES) {
+		// +++++++++++++++++++++++++++++++++++++++++++++++++++ 1
+		showFirstBox();
+		// ++++++++++++++++++++++++++++++++++++++++++++++++++++ 2  derzeitiges
+		showSecondBoxDirectory();
+		// +++++++++++++++++++++++++++++++++++++++++++++++++++++ 3  Speicherauslastung
+		showThirdBoxMemory();
+		// +++++++++++++++++++++++++++++++++++++++++++++++++++++++ 4 eigene Listklasse benutzen/Testen
+		showFourthBoxAndCheckListForFunctionality();
+		printf_s("Debug here\n");
+		//system("pause") ist kein netter system-call, aber funktioniert hier erstmal, um User nach input zu fragen, bis man fort fährt
+		system("pause");
+	}
 	//++++++++++++++++++++++++++++++++++++++++++++++++  5  NEUES FENSTER
 
 
@@ -136,62 +110,21 @@ int main(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 	//wird dann in hwnd gespeichert (handle)
 	hwnd = CreateWindowW(wc.lpszClassName, L"Window",
 		WS_OVERLAPPEDWINDOW | WS_VISIBLE,
-		100, 100, 350, 250, NULL, NULL, hInstance, NULL);
+		100, 100, 250, 150, 0, 0, hInstance, NULL);
 	//Fenster zeigen
 	ShowWindow(hwnd, CmdShow);
 	UpdateWindow(hwnd);
 
 	//hole Nachricht für das Fenster aus dem Message-Buffer
 	while (GetMessage(&msg, NULL, 0, 0)) {
-
+		TranslateMessage(&msg);
 		DispatchMessage(&msg);
 	}
 
 	return (int)msg.wParam;
 }
 
-PWSTR byteConv(const std::string*  pstr) {
-	const char* c_str = (*pstr).c_str();
-	PWSTR outp = (PWSTR) calloc( (*pstr).length()+1, sizeof(WCHAR));
-	for (BYTE i = 0; i <= pstr->length() && i < MAXBYTE; i++) {
-		outp[i] = c_str[i];
-	}
-	return outp;
-}
 
-PWSTR intConv(const std::string*  pstr) {
-	const char* c_str = (*pstr).c_str();
-	WCHAR* outp = (WCHAR*)calloc( pstr->length()+1, sizeof(WCHAR));
-	for (unsigned int i = 0; i <= pstr->length() && i < MAXBYTE; i++) {
-		outp[i] = c_str[i];
-	}
-	return outp;
-}
-
-PWSTR longConv(const std::string*  pstr) {
-	const char* c_str = (*pstr).c_str();
-	WCHAR* outp = (WCHAR*)calloc(pstr->length()+1, sizeof(WCHAR));
-	for (unsigned long i = 0; i <= pstr->length() && i < MAXBYTE; i++) {
-		outp[i] = c_str[i];
-	}
-	return outp;
-}
-
-PWSTR strToPWSTR(const char arr[], int len) {
-	WCHAR* ret = (WCHAR*)calloc(len , sizeof(WCHAR));
-	for (unsigned int i = 0; i < (unsigned int) len; i++) {
-		ret[i] = arr[i];
-	}
-	return ret;
-}
-
-PWSTR strToPWSTR(const wchar_t arr[], int len) {
-	WCHAR* ret = (WCHAR*)calloc(len, sizeof(WCHAR));
-	for (unsigned int i = 0; i < (unsigned int) len; i++) {
-		ret[i] = arr[i];
-	}
-	return ret;
-}
 
 
 LRESULT CALLBACK WndProc(HWND hwnd, UINT msg,
@@ -199,15 +132,34 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg,
 
 	switch (msg) {
 
+	case WM_CREATE:
+
+		CenterWindow(hwnd);
+		break;
+
 	case WM_DESTROY:
 
+
+		//ohne die PostQuitMessage-Funktion wird das Fenster trotzdem durch das Kreuz geschlossen, aber das Programm läuft nicht weiter
 		PostQuitMessage(0);
 		break;
 	}
 	return DefWindowProcW(hwnd, msg, wParam, lParam);
 }
 
+void CenterWindow(HWND hwnd) {
 
+	RECT rc = { 0 };
+	GetWindowRect(hwnd, &rc);
+	int win_w = rc.right - rc.left;
+	int win_h = rc.bottom - rc.top;
+
+	int screen_w = GetSystemMetrics(SM_CXSCREEN);
+	int screen_h = GetSystemMetrics(SM_CYSCREEN);
+
+	SetWindowPos(hwnd, HWND_TOP, (screen_w - win_w) / 2,
+		(screen_h - win_h) / 2, 0, 0, SWP_NOSIZE);
+}
 
 // Programm ausführen: STRG+F5 oder "Debuggen" > Menü "Ohne Debuggen starten"
 // Programm debuggen: F5 oder "Debuggen" > Menü "Debuggen starten"
@@ -340,4 +292,48 @@ int showFourthBoxAndCheckListForFunctionality(){
 
 	if (r == 0) return 1;
 	return 0;
+}
+
+
+PWSTR byteConv(const std::string*  pstr) {
+	const char* c_str = (*pstr).c_str();
+	PWSTR outp = (PWSTR)calloc((*pstr).length() + 1, sizeof(WCHAR));
+	for (BYTE i = 0; i <= pstr->length() && i < MAXBYTE; i++) {
+		outp[i] = c_str[i];
+	}
+	return outp;
+}
+
+PWSTR intConv(const std::string*  pstr) {
+	const char* c_str = (*pstr).c_str();
+	WCHAR* outp = (WCHAR*)calloc(pstr->length() + 1, sizeof(WCHAR));
+	for (unsigned int i = 0; i <= pstr->length() && i < MAXBYTE; i++) {
+		outp[i] = c_str[i];
+	}
+	return outp;
+}
+
+PWSTR longConv(const std::string*  pstr) {
+	const char* c_str = (*pstr).c_str();
+	WCHAR* outp = (WCHAR*)calloc(pstr->length() + 1, sizeof(WCHAR));
+	for (unsigned long i = 0; i <= pstr->length() && i < MAXBYTE; i++) {
+		outp[i] = c_str[i];
+	}
+	return outp;
+}
+
+PWSTR strToPWSTR(const char arr[], int len) {
+	WCHAR* ret = (WCHAR*)calloc(len, sizeof(WCHAR));
+	for (unsigned int i = 0; i < (unsigned int)len; i++) {
+		ret[i] = arr[i];
+	}
+	return ret;
+}
+
+PWSTR strToPWSTR(const wchar_t arr[], int len) {
+	WCHAR* ret = (WCHAR*)calloc(len, sizeof(WCHAR));
+	for (unsigned int i = 0; i < (unsigned int)len; i++) {
+		ret[i] = arr[i];
+	}
+	return ret;
 }
