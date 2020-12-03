@@ -21,6 +21,10 @@
 #pragma comment(lib, "user32.lib")
 
 
+void showFirstBox();
+int showSecondBoxDirectory();
+int showThirdBoxMemory();
+int showFourthBoxAndCheckListForFunctionality();
 //HEAD
 
 PWSTR byteConv(const std::string*  pstr);
@@ -56,121 +60,39 @@ int main(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 
 
 	// +++++++++++++++++++++++++++++++++++++++++++++++++++ 1
+
+
+
+	showFirstBox();
+
 	
-
-	int x = GetSystemMetrics(SM_CXSCREEN);
-	int y = GetSystemMetrics(SM_CYSCREEN);
-	std::stringstream sstream;
-	sstream << "The screen size is: " << to_string(x) << " x " << y;
-	string str = sstream.str();
-	PWSTR pntr_wchar = byteConv(&str);
-	//Nachrichtenbox pausiert programmausführung bis Fenster geschlossen
-	// NULL --> bezieht sich nicht auf ein vorhandenes Fenster, ansonsten hier HINSTANCE einfügen
-	// pntr_wchar --> Text
-	// L"Title" --> Title
-	MessageBoxW(NULL, pntr_wchar, L"Title", MB_OK);
-
-	free(pntr_wchar);
 
 
 	// ++++++++++++++++++++++++++++++++++++++++++++++++++++ 2  derzeitiges
 
 
-	wchar_t buf[MAX_PATH+1];
-	int r = GetCurrentDirectory(MAX_PATH + 1, buf);
-	if (r == 0) return 1;
-	PWSTR pntr2 = strToPWSTR(buf, sizeof(buf));
-	r = MessageBoxW(NULL, pntr2 , L"CURRENT DIRECTORY:", MB_OK);
-	if (r == 0) return 1;
 
-	free(pntr2);
+
+	showSecondBoxDirectory();
+
+
 	
 
 	// +++++++++++++++++++++++++++++++++++++++++++++++++++++ 3  Speicherauslastung
 
 
-	//initialisiere array mit 0 -->  BSP: 	int arr[50] = { 0 };
 
-	MEMORYSTATUSEX mem = { 0 };
 
-	//pass own length (like array-length) to the structure, to keep it stored. Results in no int len variable being passed to GlobalMemoryStatusEx
-	mem.dwLength = sizeof(mem);
-
-	//store current memory information in the mem structure
-	r = GlobalMemoryStatusEx(&mem);
-	sstream.str("");
-	//clear only clears flags, etc. Should be called, when initializing the sstream anew
-	sstream.clear();
-	sstream << "Memory in use: " << mem.dwMemoryLoad << "percent\n"
-		<< "Total physical memory: " << mem.ullTotalPhys << "\n"
-		<< "Total free physical memory: " << mem.ullAvailPhys << "\n"
-		<< "Total virtual memory: " << mem.ullAvailVirtual << "\n"
-		<< "Free virtual memory: " << mem.ullAvailVirtual << "\n";
-	str = sstream.str();
-	PWSTR pntr3 = intConv(&str);
-
-	r = MessageBoxW(NULL, pntr3, L"Memory Usage:", MB_OK);
-	if (r == 0) return 1;
-
-	free(pntr3);
+	showThirdBoxMemory();
+	
 
 
 	// +++++++++++++++++++++++++++++++++++++++++++++++++++++++ 4 eigene Listklasse benutzen/Testen
 
 
-	//check debugger for memory leaks, just fill with bunch of stuff, delete and repeat, also check GetTickCount for speed performance
-	SingleLinkedList<int>* list = new SingleLinkedList<int>();
-	DWORD start;
-	DWORD end;
-	DWORD res;
-	int result[1000] = { 0 };
-
-	for (int c = 0; c < 500; c++) {
-		start = GetTickCount();
-		for (int i = 0; i < 10000; i = i + 2) {
-			int* elem = new int(rand()); 
-			list->pushBack(elem);
-		}
-
-		while (list->getSize() > 0) {
-			list->removeAndFreeElem(0);
-		}
-		end = GetTickCount();
-		res = end - start;
-		for (int j = 0; j < 1000; j++) {
-			if (j == res) {
-				result[j]++;
-				break;
-			}
-		}
-	}
-
-	for (int i = 0; i < 1000; i++) {
-		if (result[i] != 0) {
-			printf_s("%d -> %d\n", i, result[i]);
-		}
-	}
 	
 
-	//fülle mit ein paar Daten, die man anzeigen lassen kann
-	for (int i = 0; i < 50; i = i ++ ) {
-		int* elem = new int(rand()%100);
-		list->pushBack(elem);
-	}
-
-
-	//zeige Liste
-	str = list->to_string();
-	PWSTR pntr4 = intConv(&str);
-	r = MessageBoxW(NULL, pntr4, L"List: ", MB_OK);
-
-	//und löschen
-	while (list->getSize() > 0) {
-		list->removeAndFreeElem(0);
-	}
-
-	if (r == 0) return 1;
-
+	showFourthBoxAndCheckListForFunctionality();
 
 
 	
@@ -297,3 +219,125 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg,
 //   4. Verwenden Sie das Fenster "Fehlerliste", um Fehler anzuzeigen.
 //   5. Wechseln Sie zu "Projekt" > "Neues Element hinzufügen", um neue Codedateien zu erstellen, bzw. zu "Projekt" > "Vorhandenes Element hinzufügen", um dem Projekt vorhandene Codedateien hinzuzufügen.
 //   6. Um dieses Projekt später erneut zu öffnen, wechseln Sie zu "Datei" > "Öffnen" > "Projekt", und wählen Sie die SLN-Datei aus.
+
+
+void showFirstBox() {
+	using std::to_string;
+	using std::string;
+	using std::stringstream;
+
+	int x = GetSystemMetrics(SM_CXSCREEN);
+	int y = GetSystemMetrics(SM_CYSCREEN);
+	stringstream sstream;
+	sstream << "The screen size is: " << to_string(x) << " x " << y;
+	string str = sstream.str();
+	PWSTR pntr_wchar = byteConv(&str);
+	//Nachrichtenbox pausiert programmausführung bis Fenster geschlossen
+	// NULL --> bezieht sich nicht auf ein vorhandenes Fenster, ansonsten hier HINSTANCE einfügen
+	// pntr_wchar --> Text
+	// L"Title" --> Title
+	MessageBoxW(NULL, pntr_wchar, L"Title", MB_OK);
+
+	free(pntr_wchar);
+}
+
+
+int  showSecondBoxDirectory() {
+	wchar_t buf[MAX_PATH + 1];
+	int r = GetCurrentDirectory(MAX_PATH + 1, buf);
+	if (r == 0) return 1;
+	PWSTR pntr2 = strToPWSTR(buf, sizeof(buf));
+	r = MessageBoxW(NULL, pntr2, L"CURRENT DIRECTORY:", MB_OK);
+	if (r == 0) return 1;
+
+	free(pntr2);
+	return 0;
+}
+
+int showThirdBoxMemory() {
+	int r;
+	std::string str;
+	std::stringstream sstream;
+	//initialisiere array mit 0 -->  BSP: 	int arr[50] = { 0 };
+
+	MEMORYSTATUSEX mem = { 0 };
+
+	//pass own length (like array-length) to the structure, to keep it stored. Results in no int len variable being passed to GlobalMemoryStatusEx
+	mem.dwLength = sizeof(mem);
+
+	//store current memory information in the mem structure
+	r = GlobalMemoryStatusEx(&mem);
+	sstream.str("");
+	//clear only clears flags, etc. Should be called, when initializing the sstream anew
+	sstream.clear();
+	sstream << "Memory in use: " << mem.dwMemoryLoad << "percent\n"
+		<< "Total physical memory: " << mem.ullTotalPhys << "\n"
+		<< "Total free physical memory: " << mem.ullAvailPhys << "\n"
+		<< "Total virtual memory: " << mem.ullAvailVirtual << "\n"
+		<< "Free virtual memory: " << mem.ullAvailVirtual << "\n";
+	str = sstream.str();
+	PWSTR pntr3 = intConv(&str);
+
+	r = MessageBoxW(NULL, pntr3, L"Memory Usage:", MB_OK);
+	if (r == 0) return 1;
+
+	free(pntr3);
+	return 0;
+}
+
+
+int showFourthBoxAndCheckListForFunctionality(){
+	//check debugger for memory leaks, just fill with bunch of stuff, delete and repeat, also check GetTickCount for speed performance
+	SingleLinkedList<int>* list = new SingleLinkedList<int>();
+	DWORD start;
+	DWORD end;
+	DWORD res;
+	int result[1000] = { 0 };
+
+	for (int c = 0; c < 500; c++) {
+		start = GetTickCount();
+		for (int i = 0; i < 10000; i = i + 2) {
+			int* elem = new int(rand());
+			list->pushBack(elem);
+		}
+
+		while (list->getSize() > 0) {
+			list->removeAndFreeElem(0);
+		}
+		end = GetTickCount();
+		res = end - start;
+		for (int j = 0; j < 1000; j++) {
+			if (j == res) {
+				result[j]++;
+				break;
+			}
+		}
+	}
+
+	for (int i = 0; i < 1000; i++) {
+		if (result[i] != 0) {
+			printf_s("%d -> %d\n", i, result[i]);
+		}
+	}
+
+
+	//fülle mit ein paar Daten, die man anzeigen lassen kann
+	for (int i = 0; i < 50; i = i++) {
+		int* elem = new int(rand() % 100);
+		list->pushBack(elem);
+	}
+
+
+	//zeige Liste
+	std::string str = list->to_string();
+	PWSTR pntr4 = intConv(&str);
+	int r = MessageBoxW(NULL, pntr4, L"List: ", MB_OK);
+
+	//und löschen
+	while (list->getSize() > 0) {
+		list->removeAndFreeElem(0);
+	}
+
+	if (r == 0) return 1;
+	return 0;
+}
