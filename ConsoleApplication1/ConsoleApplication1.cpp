@@ -12,7 +12,6 @@
 #include <Lmcons.h>
 #include <VersionHelpers.h>
 #include <time.h>
-
 #include "SingleLinkedList.h"
 //we can't add a SingleLinkedList.cpp file and include that, because a template can't be instantiated at compile time, so the compiler can't access the implementation
 //anymore when creating an object
@@ -23,6 +22,8 @@
 #pragma comment(lib, "user32.lib")
 //HEAD
 #define SHOW_UNNECESSARIES 0
+#define ID_HOTKEY 1
+
 void showFirstBox();
 int showSecondBoxDirectory();
 int showThirdBoxMemory();
@@ -40,7 +41,14 @@ PWSTR strToPWSTR(const wchar_t arr[], int len);
 LRESULT CALLBACK WndProc(HWND hwnd, UINT msg,
 	WPARAM wParam, LPARAM lParam);
 void CenterWindow(HWND hwnd);
+LRESULT CALLBACK PanelProc(HWND, UINT, WPARAM, LPARAM);
 
+
+void RegisterRedPanelClass(void);
+void RegisterBluePanelClass(void);
+
+HWND sub1, sub2;
+BOOLEAN colorBool = false;
 //ENDHEAD
 
 
@@ -108,14 +116,43 @@ int main(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 	RegisterClassW(&wc);
 	//Fenster erstellen mit Werten: wc.lpszClassName sorgt dafür, dass unsere Fenster-Vorlage benutzt wird, Referenz auf dieses Fenster
 	//wird dann in hwnd gespeichert (handle)
-	hwnd = CreateWindowW(wc.lpszClassName, L"Window",
+	hwnd = CreateWindowW(wc.lpszClassName, L"Windows",
 		WS_OVERLAPPEDWINDOW | WS_VISIBLE,
-		100, 100, 250, 150, 0, 0, hInstance, NULL);
-	//Fenster zeigen
-	ShowWindow(hwnd, CmdShow);
-	UpdateWindow(hwnd);
+		100, 100, 250, 180, 0, 0, hInstance, NULL);
+	
+	RegisterRedPanelClass();
 
-	//hole Nachricht für das Fenster aus dem Message-Buffer
+	sub1=CreateWindowW(L"RedPanelClass", NULL,
+		WS_CHILD | WS_VISIBLE,
+		//X
+		20,
+		//Y
+		20,
+		//width
+		80,
+		//height
+		80,
+		//window
+		hwnd,
+		//unique identifier for every child window
+		(HMENU)1,
+
+		NULL,
+
+		NULL);
+
+
+
+	
+
+	RegisterBluePanelClass();
+
+	sub2=CreateWindowW(L"BluePanelClass", NULL,
+		WS_CHILD | WS_VISIBLE,
+		120, 20, 80, 80,
+		hwnd, (HMENU)2, NULL, NULL);
+
+	//hole Nachricht für das Fenster aus dem Message-Buffer, das pausiert programmausführung, wenn Buffer leer
 	while (GetMessage(&msg, NULL, 0, 0)) {
 		TranslateMessage(&msg);
 		DispatchMessage(&msg);
@@ -131,19 +168,88 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg,
 	WPARAM wParam, LPARAM lParam) {
 
 	switch (msg) {
+	case WM_KEYDOWN:
+
+		if (wParam == VK_ESCAPE) {
+
+			int ret = MessageBoxW(hwnd, L"Are you sure to quit?",
+				L"Message", MB_OKCANCEL);
+
+			if (ret == IDOK) {
+
+				SendMessage(hwnd, WM_CLOSE, 0, 0);
+			}
+		}
+
+		if (wParam == 0x46) //F
+		{
+			
+		}
+
+		break;
+	case WM_HOTKEY:
+		if (wParam == ID_HOTKEY) {
+			CenterWindow(hwnd);
+
+		}
+		break;
 
 	case WM_CREATE:
 
-		CenterWindow(hwnd);
-		break;
+		//STRG + C
+		//MOD_CONTROL == strg,   0x43 == c
+		//ID_HOTKEY ist die dieser Tastenkombination zugewiesene id, wird für Aufrufe benötigt
+		RegisterHotKey(hwnd, ID_HOTKEY, MOD_CONTROL, 0x43);
 
+		break;
 	case WM_DESTROY:
 
-
+		UnregisterHotKey(hwnd, ID_HOTKEY);
 		//ohne die PostQuitMessage-Funktion wird das Fenster trotzdem durch das Kreuz geschlossen, aber das Programm läuft nicht weiter
 		PostQuitMessage(0);
 		break;
 	}
+	//default Window Procedure
+	return DefWindowProcW(hwnd, msg, wParam, lParam);
+}
+
+
+LRESULT CALLBACK PanelProc(HWND hwnd, UINT msg,
+	WPARAM wParam, LPARAM lParam) {
+	static COLORREF backcolor = RGB(0, 255, 0);
+	switch (msg) {
+	case WM_ERASEBKGND:
+		if (hwnd == sub1 && colorBool) {
+			HPEN pen;
+			HBRUSH	brush;
+			RECT rect;
+			//PEN ist für den Rand da. Hat immer mindestens Größe 1, deshalb zu passender Farbe
+			pen = CreatePen(PS_SOLID, 1, RGB(0, 255, 0));
+			//BRUSH ist die Farbe des Vierecks
+			brush = CreateSolidBrush(RGB(0, 255, 0));
+			//packe diese beiden in den device Context, sie werden smart hinzugefügt und von SelectObject richtig eingesetzt
+			//wParam ist bei der WM_ERASEBKGND-Nachricht immer der device context, deshalb cast sicher
+			SelectObject((HDC)wParam, pen);
+			SelectObject((HDC)wParam, brush);
+			//hole das innere (nicht Window) Rectangle und speicher in rect
+			GetClientRect(hwnd, &rect);
+			//zeichne ein neues
+			Rectangle((HDC)wParam, rect.left, rect.top, rect.right, rect.bottom);
+			
+			return (INT_PTR)brush;
+		}
+
+		break;
+	case WM_LBUTTONUP:
+
+		colorBool = true;
+		MessageBeep(MB_OK);
+		
+		SendMessage(sub1, WM_ERASEBKGND, (UINT_PTR)GetWindowDC(sub1) , 0);
+		break;
+
+	}
+
 	return DefWindowProcW(hwnd, msg, wParam, lParam);
 }
 
@@ -151,6 +257,7 @@ void CenterWindow(HWND hwnd) {
 
 	RECT rc = { 0 };
 	GetWindowRect(hwnd, &rc);
+
 	int win_w = rc.right - rc.left;
 	int win_h = rc.bottom - rc.top;
 
@@ -159,6 +266,34 @@ void CenterWindow(HWND hwnd) {
 
 	SetWindowPos(hwnd, HWND_TOP, (screen_w - win_w) / 2,
 		(screen_h - win_h) / 2, 0, 0, SWP_NOSIZE);
+}
+
+
+void RegisterRedPanelClass(void) {
+
+	HBRUSH hbrush = CreateSolidBrush(RGB(255, 0, 0));
+
+	WNDCLASSW rwc = { 0 };
+
+	rwc.lpszClassName = L"RedPanelClass";
+	rwc.hbrBackground = hbrush;
+	rwc.lpfnWndProc = PanelProc;
+	rwc.hCursor = LoadCursor(0, IDC_ARROW);
+	RegisterClassW(&rwc);
+}
+
+void RegisterBluePanelClass(void) {
+
+	HBRUSH hbrush = CreateSolidBrush(RGB(0, 0, 255));
+
+	WNDCLASSW rwc = { 0 };
+
+	rwc.lpszClassName = L"BluePanelClass";
+	rwc.hbrBackground = hbrush;
+	rwc.lpfnWndProc = PanelProc;
+	rwc.hCursor = LoadCursor(0, IDC_ARROW);
+
+	RegisterClassW(&rwc);
 }
 
 // Programm ausführen: STRG+F5 oder "Debuggen" > Menü "Ohne Debuggen starten"
