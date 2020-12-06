@@ -153,9 +153,11 @@
   <ItemGroup>
     <ClCompile Include="ConsoleApplication1.cpp" />
     <ClCompile Include="SingleLinkedList_impl.h" />
+    <ClCompile Include="Snakemodel.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="SingleLinkedList.h" />
+    <ClInclude Include="Snakemodel.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

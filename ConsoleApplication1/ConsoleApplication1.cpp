@@ -12,11 +12,10 @@
 #include <Lmcons.h>
 #include <VersionHelpers.h>
 #include <time.h>
-#include "SingleLinkedList.h"
 //we can't add a SingleLinkedList.cpp file and include that, because a template can't be instantiated at compile time, so the compiler can't access the implementation
 //anymore when creating an object
 #include "SingleLinkedList_impl.h"
-
+#include "Snakemodel.h"
 
 
 #pragma comment(lib, "user32.lib")
@@ -85,7 +84,22 @@ int main(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 	}
 	//++++++++++++++++++++++++++++++++++++++++++++++++  5  NEUES FENSTER
 
+	
+	Snakemodel model(38, 16);
+	
+	printf_s((model.body.to_string()).c_str());
 
+
+	system("pause");
+	
+	model.start();
+
+	system("pause");
+
+	model.lost();
+
+	system("pause");
+	delete &model;
 	//variable, um Nachrichten zu holen
 	MSG  msg;
 	//handle zum Fenster, das wir öffnen wollen
@@ -241,11 +255,14 @@ LRESULT CALLBACK PanelProc(HWND hwnd, UINT msg,
 
 		break;
 	case WM_LBUTTONUP:
-
-		colorBool = true;
-		MessageBeep(MB_OK);
 		
-		SendMessage(sub1, WM_ERASEBKGND, (UINT_PTR)GetWindowDC(sub1) , 0);
+		
+		MessageBeep(MB_OK);
+		if (hwnd == sub1) {
+			colorBool = true;
+			SendMessage(sub1, WM_ERASEBKGND, (UINT_PTR)GetWindowDC(sub1), 0);
+		}
+		
 		break;
 
 	}

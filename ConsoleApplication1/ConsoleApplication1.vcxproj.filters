@@ -21,9 +21,15 @@
     <ClCompile Include="SingleLinkedList_impl.h">
       <Filter>Headerdateien</Filter>
     </ClCompile>
+    <ClCompile Include="Snakemodel.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="SingleLinkedList.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="Snakemodel.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
   </ItemGroup>

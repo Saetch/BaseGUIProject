@@ -119,13 +119,13 @@ T SingleLinkedList<T>::getP(unsigned int index) {
 
 template <typename T>
 int SingleLinkedList<T>::removeElement(unsigned int index) {
-	ListElem* ptr = firstElement;
+	ListElem<T>* ptr = firstElement;
 	if (index == 0) {
 		firstElement = firstElement->next;
 		
 	}
 	else {
-		ListElem* ptr2;
+		ListElem<T>* ptr2;
 		for (unsigned int i = 0; i < index - 1; i++) {
 			ptr = ptr->next;
 		}

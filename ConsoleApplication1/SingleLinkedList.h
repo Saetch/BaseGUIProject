@@ -40,7 +40,9 @@ public:
 
 	int removeAndFreeElem(unsigned int index);
 
+	int forEach(int(*fn)(T ele)) {
 
+	}
 
 
 
