@@ -85,21 +85,21 @@ int main(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 	//++++++++++++++++++++++++++++++++++++++++++++++++  5  NEUES FENSTER
 
 	
-	Snakemodel model(38, 16);
+	Snakemodel* model = new Snakemodel(38, 16);
 	
-	printf_s((model.body.to_string()).c_str());
+	printf_s((model->body->to_string()).c_str());
 
 
-	system("pause");
+	//system("pause");
 	
-	model.start();
+	model->start();
 
-	system("pause");
+	while (model->getGameState()) {};
 
-	model.lost();
+	model->lost();
 
-	system("pause");
-	delete &model;
+	//system("pause");
+	delete model;
 	//variable, um Nachrichten zu holen
 	MSG  msg;
 	//handle zum Fenster, das wir öffnen wollen

@@ -14,6 +14,9 @@
 
 #define DEFAULTLENGTH 3
 
+std::mutex mutex;
+
+
 int Snakemodel::returnChanged(int arr[], int len)
 {
 
@@ -23,9 +26,11 @@ int Snakemodel::returnChanged(int arr[], int len)
 
 void Snakemodel::start()
 {
+	printf_s("Starting game session ...\n");
 	//memberfunktionen brauchen nicht nur die Funktion, sondern auch die zugehörige Instanz
-	thr1 = std::thread(&Snakemodel::step, &(*this));
-	this->gameState = SNAKE_GAMESTATE_RUNNING;
+	this->gameState.store(SNAKE_GAMESTATE_RUNNING);
+	thr1 = new std::thread(&Snakemodel::step, &(*this));
+	
 }
 
 BYTE Snakemodel::turnR()
@@ -49,10 +54,12 @@ void Snakemodel::restart()
 
 Snakemodel::Snakemodel(int width, int height)
 {
+	this->body = new SingleLinkedList<int>();
+	
 	// this ist in C++ ein Pointer 
 	(*		this).length = width * height;
 	(*		this).direction = SNAKE_RIGHT;
-	this->illegalDirection = SNAKE_LEFT;
+	this->illegalDirection.store ( SNAKE_LEFT );
 	this->field = (int*)calloc(this->length, sizeof(int));
 
 	//wieviele millisekunden vergehen, bis die Bewegung weiterläuft
@@ -60,19 +67,30 @@ Snakemodel::Snakemodel(int width, int height)
 	
 	//this might be unneeded
 	this->nextStep = NULL;
-
+	this->body = new SingleLinkedList<int>();
 	for (int i = 0; i < DEFAULTLENGTH; ) {
-		this->body.pushBack(this->field+i);
+		this->body->pushBack(this->field+i);
 		this->field[i] = ++i;
 	}
+	
 }
 
 Snakemodel::~Snakemodel()
-{
-	free(this->field);
-	while (this->body.getSize() > 0) {
-		this->body.removeElement(0);
+{ 
+	
+	
+	while (this->body->getSize() > 0) {
+		this->body->removeElement(0);
 	}
+	free(this->field);
+
+	this->gameState.store( SNAKE_GAMESTATE_LOST );
+	
+
+	
+	delete this->body;
+	
+	
 }
 
 
@@ -89,6 +107,8 @@ int Snakemodel::generateNewFood()
 
 int Snakemodel::step()
 {
+    //printf_s("HELLO, THREAD STARTED\n");
+
 	auto callMs = (std::chrono::time_point_cast<std::chrono::milliseconds>)(std::chrono::steady_clock::now());
 
 	callMs = callMs + (std::chrono::milliseconds)this->speed;
@@ -99,8 +119,12 @@ int Snakemodel::step()
 
 
 	//PS: bei jedem Datentyp über nano kommt es erst bei über 500 Jahren zu einem Overflow
-	while (this->gameState ) {
-	
+	while (this->gameState.load() ) {
+
+		if (i >= 15) {
+			this->gameState.store(SNAKE_GAMESTATE_LOST);
+		}
+
 		printf_s("%d\n", i++);
 		printf_s("%d\n\n", (int)callMs.time_since_epoch().count());
 

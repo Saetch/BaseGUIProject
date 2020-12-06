@@ -80,6 +80,7 @@ inline int SingleLinkedList<T>::pushBack(T* newElement) {
 
 template <typename T>
 std::string SingleLinkedList<T>::to_string() {
+	if (this->size == 0) return "[ ]";
 	std::string ret = "";
 	std::stringstream sstream;
 	
