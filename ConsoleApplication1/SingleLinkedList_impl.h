@@ -34,6 +34,12 @@ SingleLinkedList<T>::~SingleLinkedList() {
 }
 
 template<typename T>
+inline ListElem<T>** SingleLinkedList<T>::getElemP()
+{
+	return &firstElement;
+}
+
+template<typename T>
 inline int SingleLinkedList<T>::getSize()
 {
 	return size;
@@ -43,9 +49,18 @@ inline int SingleLinkedList<T>::getSize()
 //TODO: see above, allocate memory for newElement
 template <typename T>
 inline int SingleLinkedList<T>::add(T newElement) {
+	int* newP = (int*)malloc(sizeof(T));
+	*newP = newElement;
+	this->push(newP);
+	return newElement;
+}
 
-	//error
-	return 1;
+template <typename T>
+inline int SingleLinkedList<T>::addBack(T newElement) {
+	int* newP = (int*)malloc(sizeof(T));
+	*newP = newElement;
+	this->pushBack(newP);
+	return newElement;
 }
 
 template <typename T>
@@ -173,4 +188,40 @@ int SingleLinkedList<T>::removeAndFreeElem(unsigned int index) {
 	}
 	return 0;
 
+}
+
+template<typename T>
+inline int SingleLinkedList<T>::forEach(int(*fn)(T ele))
+{
+
+	ListElem<T>* curr = this->firstElement;
+	for (int i = 0; i < this->size; i++) {
+		if (curr == NULL) {
+			printf_s("ERROR DURING LIST->forEach ... element NULL \n");
+			return 1;
+		}
+
+		fn(curr->element);
+		curr = curr->next;
+	}
+
+	return 0;
+}
+
+template<typename T>
+inline int SingleLinkedList<T>::forEachInt(int(*fn)(int* ele))
+{
+
+	ListElem<T>* curr = this->firstElement;
+	for (unsigned int i = 0; i < this->size; i++) {
+		if (curr == NULL) {
+			printf_s("ERROR DURING LIST->forEach ... element NULL \n");
+			return 1;
+		}
+
+		fn(((int*)(curr->element)));
+		curr = curr->next;
+	}
+
+	return 0;
 }

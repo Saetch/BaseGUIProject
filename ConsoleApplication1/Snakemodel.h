@@ -52,7 +52,11 @@ public:
 			this->gameState.store(0);
 			return 0;
 		};
+
+		int reduceOne(int* i);
 private:
+	int WIDTH;
+	int HEIGHT;
 	int speed;
 	int length;
 	int head;
@@ -60,6 +64,7 @@ private:
 	std::atomic<BYTE> gameState;
 	int eat();
 	int generateNewFood();
+	int game();
 	std::atomic<BYTE> illegalDirection;
 	int step();
 	std::thread* thr1;

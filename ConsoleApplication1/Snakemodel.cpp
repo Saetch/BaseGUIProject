@@ -27,9 +27,9 @@ int Snakemodel::returnChanged(int arr[], int len)
 void Snakemodel::start()
 {
 	printf_s("Starting game session ...\n");
-	//memberfunktionen brauchen nicht nur die Funktion, sondern auch die zugehörige Instanz
 	this->gameState.store(SNAKE_GAMESTATE_RUNNING);
-	thr1 = new std::thread(&Snakemodel::step, &(*this));
+	//memberfunktionen brauchen nicht nur die Funktion, sondern auch die zugehörige Instanz
+	thr1 = new std::thread(&Snakemodel::game, &(*this));
 	
 }
 
@@ -54,6 +54,8 @@ void Snakemodel::restart()
 
 Snakemodel::Snakemodel(int width, int height)
 {
+	this->WIDTH = width;
+	this->HEIGHT = height;
 	this->body = new SingleLinkedList<int>();
 	
 	// this ist in C++ ein Pointer 
@@ -68,8 +70,8 @@ Snakemodel::Snakemodel(int width, int height)
 	//this might be unneeded
 	this->nextStep = NULL;
 	this->body = new SingleLinkedList<int>();
-	for (int i = 0; i < DEFAULTLENGTH; ) {
-		this->body->pushBack(this->field+i);
+	for (int i = 0; i < DEFAULTLENGTH;  ) {
+		this->body->addBack(i);
 		this->field[i] = ++i;
 	}
 	
@@ -80,7 +82,7 @@ Snakemodel::~Snakemodel()
 	
 	
 	while (this->body->getSize() > 0) {
-		this->body->removeElement(0);
+		this->body->removeAndFreeElem(0);
 	}
 	free(this->field);
 
@@ -105,7 +107,7 @@ int Snakemodel::generateNewFood()
 	return 0;
 }
 
-int Snakemodel::step()
+int Snakemodel::game()
 {
     //printf_s("HELLO, THREAD STARTED\n");
 
@@ -121,19 +123,20 @@ int Snakemodel::step()
 	//PS: bei jedem Datentyp über nano kommt es erst bei über 500 Jahren zu einem Overflow
 	while (this->gameState.load() ) {
 
-		if (i >= 15) {
+		if (i >= 20) {
 			this->gameState.store(SNAKE_GAMESTATE_LOST);
 		}
 
-		printf_s("%d\n", i++);
-		printf_s("%d\n\n", (int)callMs.time_since_epoch().count());
+		printf_s("%d\n\n", i++);
+		printf_s(this->body->to_string().c_str());
+		printf_s("\n");
 
 		//wir rechnen immer die Zeit zwischen aufrufen dazu, damit es nicht zu einer Zeitverschiebung wegen den ausgeführten Befehlen kommt
 		callMs += (std::chrono::milliseconds)this->speed;
 
 		std::this_thread::sleep_until(callMs);
 		
-
+		this->step();
 		
 	}
 
@@ -141,4 +144,39 @@ int Snakemodel::step()
 
 	return 0;
 
+}
+
+
+int Snakemodel::reduceOne(int* i) {
+	
+	(*i)--;
+	return 0;
+}
+
+int Snakemodel::step()
+{
+
+	//TODO remove this line
+	if (this->body->getSize() == 0) return 0;
+	static ListElem<int>** listElem = this->body->getElemP();  //Pointer to pointer, so it never changes
+	printf_s("Element: %d\n", this->field[*(*listElem)->element]);
+	ListElem<int>* curr = *listElem; //firstElement
+	for (int i = 0; i < this->body->getSize(); i++) {
+		this->field[*(curr->element)]--;
+		curr = curr->next;
+	}
+	if (this->field[*(*listElem)->element] <= 0) {
+		this->body->removeAndFreeElem(0);
+	}
+
+
+
+
+
+
+
+	
+
+
+	return 0;
 }

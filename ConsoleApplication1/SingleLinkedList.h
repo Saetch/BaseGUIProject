@@ -1,7 +1,7 @@
 #pragma once
 #include <string>
 #include <sstream>
-
+#include <iterator>
 
 #define NULL 0
 template <typename T>
@@ -22,9 +22,13 @@ public:
 	SingleLinkedList();
 	~SingleLinkedList();
 
+	inline ListElem<T>** getElemP();
+
 	inline int getSize();
 
 	inline int add(const T newElement);
+
+	inline int addBack(const T newElement);
 
 	int push(T * newElement);
 
@@ -40,15 +44,19 @@ public:
 
 	int removeAndFreeElem(unsigned int index);
 
-	int forEach(int(*fn)(T ele)) {
+	int forEach(int(*fn)(T ele));
 
+	int forEachInt(int(*fn)(int* ele));
+
+	T begin() { return firstElement->element; }
+	T end() { return lastElement->element;  }
+
+	
+
+	SingleLinkedList<T> operator++() {
+		this->firstElement = this->firstElement->next;
+		return *this;
 	}
-
-
-
-
-
-
 
 };
 
