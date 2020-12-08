@@ -15,8 +15,7 @@
 //we can't add a SingleLinkedList.cpp file and include that, because a template can't be instantiated at compile time, so the compiler can't access the implementation
 //anymore when creating an object
 #include "SingleLinkedList_impl.h"
-#include "Snakemodel.h"
-
+#include "SnakeController.h"
 
 #pragma comment(lib, "user32.lib")
 //HEAD
@@ -69,6 +68,8 @@ int main(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 	using std::to_string;
 	srand((unsigned int)time(0));
 
+
+	//dumper für den ganzen kladdaradatsch, den man nicht brauch, aber gut zu sehen ist
 	if (SHOW_UNNECESSARIES) {
 		// +++++++++++++++++++++++++++++++++++++++++++++++++++ 1
 		showFirstBox();
@@ -81,98 +82,132 @@ int main(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 		printf_s("Debug here\n");
 		//system("pause") ist kein netter system-call, aber funktioniert hier erstmal, um User nach input zu fragen, bis man fort fährt
 		system("pause");
+
+
+		//variable, um Nachrichten zu holen
+		MSG  msg;
+		//handle zum Fenster, das wir öffnen wollen
+		HWND hwnd;
+		//Fenster-Klasse. Hier kommt Konfiguration rein, damit windows weiß, wie wir das Fenster haben wollen
+		//davon können mehrere erstellt werden. Es ist NICHT ein Fenster, es ist die Vorlage für ein Fenster
+		WNDCLASSW wc;
+		//zeichne neu, wenn bewegt oder verändert
+		wc.style = CS_HREDRAW | CS_VREDRAW;
+		//Unterklassen-Values
+		wc.cbClsExtra = 0;
+		wc.cbWndExtra = 0;
+		//Name
+		wc.lpszClassName = L"Window";
+		//handle-Instanz, aus main
+		wc.hInstance = hInstance;
+		//Hintergrund-Färben
+		wc.hbrBackground = GetSysColorBrush(COLOR_3DFACE);
+		//kein Menü
+		wc.lpszMenuName = NULL;
+		//function-pointer für message-callback procedure = unsere unten definierte Function
+		wc.lpfnWndProc = WndProc;
+		//Mauszeiger auf default
+		wc.hCursor = LoadCursor(NULL, IDC_ARROW);
+		//Fenster Icon default
+		wc.hIcon = LoadIcon(NULL, IDI_APPLICATION);
+		//Fenster registrieren, damit das OS damit kommunizieren und es anzeigen kann
+		RegisterClassW(&wc);
+		//Fenster erstellen mit Werten: wc.lpszClassName sorgt dafür, dass unsere Fenster-Vorlage benutzt wird, Referenz auf dieses Fenster
+		//wird dann in hwnd gespeichert (handle)
+		hwnd = CreateWindowW(wc.lpszClassName, L"Windows",
+			WS_OVERLAPPEDWINDOW | WS_VISIBLE,
+			100, 100, 250, 180, 0, 0, hInstance, NULL);
+
+		RegisterRedPanelClass();
+
+		sub1 = CreateWindowW(L"RedPanelClass", NULL,
+			WS_CHILD | WS_VISIBLE,
+			//X
+			20,
+			//Y
+			20,
+			//width
+			80,
+			//height
+			80,
+			//window
+			hwnd,
+			//unique identifier for every child window
+			(HMENU)1,
+
+			NULL,
+
+			NULL);
+
+
+
+
+
+		RegisterBluePanelClass();
+
+		sub2 = CreateWindowW(L"BluePanelClass", NULL,
+			WS_CHILD | WS_VISIBLE,
+			120, 20, 80, 80,
+			hwnd, (HMENU)2, NULL, NULL);
+
+		//hole Nachricht für das Fenster aus dem Message-Buffer, das pausiert programmausführung, wenn Buffer leer
+		while (GetMessage(&msg, NULL, 0, 0)) {
+			TranslateMessage(&msg);
+			DispatchMessage(&msg);
+		}
+		(int)msg.wParam;
+
 	}
-	//++++++++++++++++++++++++++++++++++++++++++++++++  5  NEUES FENSTER
-
 	
-	Snakemodel* model = new Snakemodel(38, 16);
-	
-	printf_s((model->body->to_string()).c_str());
 
+	//NUR IN DIESEM BONKER IST DER EIGENTLICHE CODE VOM EINSTIEGSPUNKT
+	/*+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+	+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+	+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+	+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+	+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+	+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+	+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+	+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+	+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+	+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+	+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+	*/
 
-	//system("pause");
+	int width = 38, height = 16;
+
+	SnakeController* ctrl = new SnakeController();
 	
-	model->start();
+	Snakemodel* model = new Snakemodel(width, height);
+
+	SnakeWindowView* view = new SnakeWindowView(width, height);
+
+	ctrl->model=model;
+	ctrl->view = view;
+	ctrl->start();
 
 	while (model->getGameState()) {};
 
 	model->lost();
 
-	//system("pause");
 	delete model;
-	//variable, um Nachrichten zu holen
-	MSG  msg;
-	//handle zum Fenster, das wir öffnen wollen
-	HWND hwnd;
-	//Fenster-Klasse. Hier kommt Konfiguration rein, damit windows weiß, wie wir das Fenster haben wollen
-	//davon können mehrere erstellt werden. Es ist NICHT ein Fenster, es ist die Vorlage für ein Fenster
-	WNDCLASSW wc;
-	//zeichne neu, wenn bewegt oder verändert
-	wc.style = CS_HREDRAW | CS_VREDRAW;
-	//Unterklassen-Values
-	wc.cbClsExtra = 0;
-	wc.cbWndExtra = 0;
-	//Name
-	wc.lpszClassName = L"Window";
-	//handle-Instanz, aus main
-	wc.hInstance = hInstance;
-	//Hintergrund-Färben
-	wc.hbrBackground = GetSysColorBrush(COLOR_3DFACE);
-	//kein Menü
-	wc.lpszMenuName = NULL;
-	//function-pointer für message-callback procedure = unsere unten definierte Function
-	wc.lpfnWndProc = WndProc;
-	//Mauszeiger auf default
-	wc.hCursor = LoadCursor(NULL, IDC_ARROW);
-	//Fenster Icon default
-	wc.hIcon = LoadIcon(NULL, IDI_APPLICATION);
-	//Fenster registrieren, damit das OS damit kommunizieren und es anzeigen kann
-	RegisterClassW(&wc);
-	//Fenster erstellen mit Werten: wc.lpszClassName sorgt dafür, dass unsere Fenster-Vorlage benutzt wird, Referenz auf dieses Fenster
-	//wird dann in hwnd gespeichert (handle)
-	hwnd = CreateWindowW(wc.lpszClassName, L"Windows",
-		WS_OVERLAPPEDWINDOW | WS_VISIBLE,
-		100, 100, 250, 180, 0, 0, hInstance, NULL);
-	
-	RegisterRedPanelClass();
-
-	sub1=CreateWindowW(L"RedPanelClass", NULL,
-		WS_CHILD | WS_VISIBLE,
-		//X
-		20,
-		//Y
-		20,
-		//width
-		80,
-		//height
-		80,
-		//window
-		hwnd,
-		//unique identifier for every child window
-		(HMENU)1,
-
-		NULL,
-
-		NULL);
-
-
-
 	
 
-	RegisterBluePanelClass();
 
-	sub2=CreateWindowW(L"BluePanelClass", NULL,
-		WS_CHILD | WS_VISIBLE,
-		120, 20, 80, 80,
-		hwnd, (HMENU)2, NULL, NULL);
+	/*+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+	+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+	+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+	+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+	+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+	+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+	+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+	+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+	+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+	+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+	+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+	*/
 
-	//hole Nachricht für das Fenster aus dem Message-Buffer, das pausiert programmausführung, wenn Buffer leer
-	while (GetMessage(&msg, NULL, 0, 0)) {
-		TranslateMessage(&msg);
-		DispatchMessage(&msg);
-	}
-
-	return (int)msg.wParam;
+	return 0;
 }
 
 
