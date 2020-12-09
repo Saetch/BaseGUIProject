@@ -17,7 +17,7 @@ class simpleList {
 	void push(void* newElem) {
 
 	}
-	
+
 };
 
 template <typename T>
@@ -30,7 +30,7 @@ SingleLinkedList<T>::SingleLinkedList() {
 
 template <typename T>
 SingleLinkedList<T>::~SingleLinkedList() {
-	
+
 }
 
 template<typename T>
@@ -79,7 +79,7 @@ inline int SingleLinkedList<T>::push(T* newElement) {
 
 template <typename T>
 inline int SingleLinkedList<T>::pushBack(T* newElement) {
-	
+
 	ListElem<T>* newLink = new ListElem<T>();
 	newLink->element = newElement;
 	if (lastElement != NULL) lastElement->next = newLink;
@@ -98,7 +98,7 @@ std::string SingleLinkedList<T>::to_string() {
 	if (this->size == 0) return "[ ]";
 	std::string ret = "";
 	std::stringstream sstream;
-	
+
 	sstream << "[ ";
 	ListElem<T>* currentElem = firstElement;
 	for (unsigned int i = 0; i < size; i++) {
@@ -107,7 +107,7 @@ std::string SingleLinkedList<T>::to_string() {
 		if (i != 0) {
 			sstream << " , ";
 		}
-		sstream << actual ;
+		sstream << actual;
 	}
 	sstream << " ]";
 	ret = sstream.str();
@@ -133,12 +133,24 @@ T SingleLinkedList<T>::getP(unsigned int index) {
 	return cur->element;
 }
 
+template<typename T>
+inline T SingleLinkedList<T>::getLast()
+{
+	return *lastElement->element;
+}
+
+template<typename T>
+inline T SingleLinkedList<T>::getLastP()
+{
+	return lastElement->element;
+}
+
 template <typename T>
 int SingleLinkedList<T>::removeElement(unsigned int index) {
 	ListElem<T>* ptr = firstElement;
 	if (index == 0) {
 		firstElement = firstElement->next;
-		
+
 	}
 	else {
 		ListElem<T>* ptr2;
@@ -160,7 +172,7 @@ int SingleLinkedList<T>::removeElement(unsigned int index) {
 		lastElement = NULL;
 	}
 	return 0;
-	
+
 }
 
 template <typename T>

@@ -25,6 +25,7 @@ int SnakeController::start()
 		return 1;
 	}
 	this->model->start();
+	return 0;
 }
 
 

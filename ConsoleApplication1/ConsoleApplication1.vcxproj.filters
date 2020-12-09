@@ -24,12 +24,24 @@
     <ClCompile Include="Snakemodel.cpp">
       <Filter>Quelldateien</Filter>
     </ClCompile>
+    <ClCompile Include="SnakeController.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="SnakeWindowView.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="SingleLinkedList.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
     <ClInclude Include="Snakemodel.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="SnakeController.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="SnakeWindowView.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
   </ItemGroup>

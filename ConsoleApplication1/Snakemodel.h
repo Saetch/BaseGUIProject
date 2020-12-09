@@ -9,51 +9,57 @@
 #include <thread>
 #include <mutex>
 #include <atomic>
+#include <sstream>
+#include <mutex>
+
+
+class SnakeController;
 
 class Snakemodel
 {
-public:	
+public:
 	int* field;
 	BYTE direction;
-	
+	SnakeController* controller;
 
 	SingleLinkedList<int>* body;
 
-	int(* fnct)(int width, int height);
+	int(*fnct)(int width, int height);
 
 
-		//anstatt, dass wir einen gesamten Canvas neuzeichnen bei jedem update-Tick, können wir gezielt angeben, welche Felder geändert wurden und nur für diese eine
-		//update Message-senden
-		int returnChanged(int arr[], int len);
+	//anstatt, dass wir einen gesamten Canvas neuzeichnen bei jedem update-Tick, können wir gezielt angeben, welche Felder geändert wurden und nur für diese eine
+	//update Message-senden
+	int returnChanged(int arr[], int len);
 
 
-		void start();
+	void start();
 
-		BYTE turnR();
-		BYTE turnL();
+	BYTE turnUP();
+	BYTE turnDown();
+	BYTE turnLeft();
+	BYTE turnRight();
+	void pause();
+	void restart();
 
-		void pause();
-		void restart();
+	Snakemodel(int width, int height);
+	~Snakemodel();
 
-		Snakemodel(int width, int height);
-		~Snakemodel();
+	inline int getGameState() {
+		return this->gameState.load();
+	}
+	inline int getSpeed() {
+		return this->speed;
+	};
+	inline int setSpeed(int newSpeed) {
+		return this->speed = newSpeed;
+	};
+	inline int lost() {
+		if (thr1 != NULL) thr1->join();
+		this->gameState.store(0);
+		return 0;
+	};
 
-		inline int getGameState() {
-			return this->gameState.load();
-		}
-		inline int getSpeed() {
-			return this->speed;
-		};
-		inline int setSpeed(int newSpeed) {
-			return this->speed = newSpeed;
-		};
-		inline int lost(){
-			if (thr1 != NULL) thr1->join();
-			this->gameState.store(0);
-			return 0;
-		};
-
-		int reduceOne(int* i);
+	int reduceOne(int* i);
 private:
 	int WIDTH;
 	int HEIGHT;
@@ -62,11 +68,12 @@ private:
 	int head;
 	int nextStep;
 	std::atomic<BYTE> gameState;
-	int eat();
 	int generateNewFood();
 	int game();
 	std::atomic<BYTE> illegalDirection;
 	int step();
 	std::thread* thr1;
+	std::mutex dirMutex;
+	int crawlOne(ListElem<int>** listElem);
+	void printField();
 };
-

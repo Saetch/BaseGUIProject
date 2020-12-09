@@ -15,7 +15,6 @@
 //we can't add a SingleLinkedList.cpp file and include that, because a template can't be instantiated at compile time, so the compiler can't access the implementation
 //anymore when creating an object
 #include "SingleLinkedList_impl.h"
-#include "SnakeController.h"
 
 #pragma comment(lib, "user32.lib")
 //HEAD
@@ -176,21 +175,21 @@ int main(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 
 	int width = 38, height = 16;
 
-	SnakeController* ctrl = new SnakeController();
+	//SnakeController* ctrl = new SnakeController();
 	
-	Snakemodel* model = new Snakemodel(width, height);
+	//Snakemodel* model = new Snakemodel(width, height);
 
-	SnakeWindowView* view = new SnakeWindowView(width, height, hInstance);
+	//SnakeWindowView* view = new SnakeWindowView(width, height, hInstance);
 
 	//ctrl->model=model;
 	//ctrl->view = view;
 	//ctrl->start();
+	while (true);
+	//while (model->getGameState()) {};
 
-	while (model->getGameState()) {};
+	//model->lost();
 
-	model->lost();
-
-	delete model;
+	//delete model;
 	
 
 

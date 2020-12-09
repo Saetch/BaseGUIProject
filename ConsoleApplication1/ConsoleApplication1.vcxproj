@@ -153,11 +153,15 @@
   <ItemGroup>
     <ClCompile Include="ConsoleApplication1.cpp" />
     <ClCompile Include="SingleLinkedList_impl.h" />
+    <ClCompile Include="SnakeController.cpp" />
     <ClCompile Include="Snakemodel.cpp" />
+    <ClCompile Include="SnakeWindowView.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="SingleLinkedList.h" />
+    <ClInclude Include="SnakeController.h" />
     <ClInclude Include="Snakemodel.h" />
+    <ClInclude Include="SnakeWindowView.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

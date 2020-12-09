@@ -20,5 +20,8 @@ private:
 	void mainWindow();
 	void grid();
 
+	static LRESULT CALLBACK WndProc(HWND hwnd, UINT msg,
+		WPARAM wParam, LPARAM lParam);
 };
+
 

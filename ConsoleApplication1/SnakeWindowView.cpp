@@ -44,7 +44,7 @@ void SnakeWindowView::mainWindow()
 	//kein Menü
 	wc.lpszMenuName = NULL;
 	//function-pointer für message-callback procedure = unsere unten definierte Function
-	wc.lpfnWndProc = WndProc;
+	wc.lpfnWndProc = SnakeWindowView::WndProc;
 	//Mauszeiger auf default
 	wc.hCursor = LoadCursor(NULL, IDC_ARROW);
 	//Fenster Icon default
@@ -59,7 +59,7 @@ void SnakeWindowView::mainWindow()
 }
 
 
-LRESULT CALLBACK WndProc(HWND hwnd, UINT msg,
+LRESULT CALLBACK SnakeWindowView::WndProc(HWND hwnd, UINT msg,
 	WPARAM wParam, LPARAM lParam) {
 
 	switch (msg) {
@@ -94,12 +94,12 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg,
 		//STRG + C
 		//MOD_CONTROL == strg,   0x43 == c
 		//ID_HOTKEY ist die dieser Tastenkombination zugewiesene id, wird für Aufrufe benötigt
-		RegisterHotKey(hwnd, ID_HOTKEY, MOD_CONTROL, 0x43);
+		//RegisterHotKey(hwnd, ID_HOTKEY, MOD_CONTROL, 0x43);
 
 		break;
 	case WM_DESTROY:
 
-		UnregisterHotKey(hwnd, ID_HOTKEY);
+		//UnregisterHotKey(hwnd, ID_HOTKEY);
 		//ohne die PostQuitMessage-Funktion wird das Fenster trotzdem durch das Kreuz geschlossen, aber das Programm läuft nicht weiter
 		PostQuitMessage(0);
 		break;

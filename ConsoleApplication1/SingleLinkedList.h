@@ -40,6 +40,10 @@ public:
 
 	T getP(unsigned int index);
 
+	T getLast();
+
+	T getLastP();
+
 	int removeElement(unsigned int index);
 
 	int removeAndFreeElem(unsigned int index);
@@ -49,9 +53,9 @@ public:
 	int forEachInt(int(*fn)(int* ele));
 
 	T begin() { return firstElement->element; }
-	T end() { return lastElement->element;  }
+	T end() { return lastElement->element; }
 
-	
+
 
 	SingleLinkedList<T> operator++() {
 		this->firstElement = this->firstElement->next;
@@ -59,5 +63,3 @@ public:
 	}
 
 };
-
-
