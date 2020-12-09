@@ -40,10 +40,6 @@ public:
 
 	T getP(unsigned int index);
 
-	T getLast();
-	
-	T getLastP();
-
 	int removeElement(unsigned int index);
 
 	int removeAndFreeElem(unsigned int index);

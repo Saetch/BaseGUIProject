@@ -133,18 +133,6 @@ T SingleLinkedList<T>::getP(unsigned int index) {
 	return cur->element;
 }
 
-template<typename T>
-inline T SingleLinkedList<T>::getLast()
-{
-	return *lastElement->element;
-}
-
-template<typename T>
-inline T SingleLinkedList<T>::getLastP()
-{
-	return lastElement->element;
-}
-
 template <typename T>
 int SingleLinkedList<T>::removeElement(unsigned int index) {
 	ListElem<T>* ptr = firstElement;

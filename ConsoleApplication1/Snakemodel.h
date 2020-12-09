@@ -9,16 +9,13 @@
 #include <thread>
 #include <mutex>
 #include <atomic>
-#include <sstream>
-#include <mutex>
-#include "SnakeController.h"
 
 class Snakemodel
 {
 public:	
 	int* field;
 	BYTE direction;
-	SnakeController* controller;
+	
 
 	SingleLinkedList<int>* body;
 
@@ -32,10 +29,9 @@ public:
 
 		void start();
 
-		BYTE turnUP();
-		BYTE turnDown();
-		BYTE turnLeft();
-		BYTE turnRight();
+		BYTE turnR();
+		BYTE turnL();
+
 		void pause();
 		void restart();
 
@@ -66,13 +62,11 @@ private:
 	int head;
 	int nextStep;
 	std::atomic<BYTE> gameState;
+	int eat();
 	int generateNewFood();
 	int game();
 	std::atomic<BYTE> illegalDirection;
 	int step();
 	std::thread* thr1;
-	std::mutex dirMutex;
-	int crawlOne(ListElem<int>** listElem);
-	void printField();
 };
 
