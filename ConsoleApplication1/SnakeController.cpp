@@ -16,7 +16,7 @@ int SnakeController::refreshIndex(int index)
 void SnakeController::initModel()
 {
 
-	this->model->controller = this;
+	//this->model->controller = this;
 }
 
 int SnakeController::start()
@@ -24,7 +24,7 @@ int SnakeController::start()
 	if (this->model == NULL || this->view == NULL) {
 		return 1;
 	}
-	this->model->start;
+	this->model->start();
 }
 
 

@@ -180,11 +180,11 @@ int main(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 	
 	Snakemodel* model = new Snakemodel(width, height);
 
-	SnakeWindowView* view = new SnakeWindowView(width, height);
+	SnakeWindowView* view = new SnakeWindowView(width, height, hInstance);
 
-	ctrl->model=model;
-	ctrl->view = view;
-	ctrl->start();
+	//ctrl->model=model;
+	//ctrl->view = view;
+	//ctrl->start();
 
 	while (model->getGameState()) {};
 
