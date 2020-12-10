@@ -10,8 +10,10 @@ SnakeController::~SnakeController()
 
 int SnakeController::refreshIndex(int index)
 {
+	this->view->refreshIndex(index);
 	return 0;
 }
+
 
 void SnakeController::initModel()
 {
@@ -25,6 +27,12 @@ int SnakeController::start()
 		return 1;
 	}
 	this->model->start();
+	MSG  msg;
+	while (GetMessage(&msg, NULL, 0, 0)) {
+		TranslateMessage(&msg);
+		DispatchMessage(&msg);
+	}
+
 	return 0;
 }
 

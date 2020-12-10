@@ -10,7 +10,6 @@ public:
 	SnakeWindowView* view;
 
 	int refreshIndex(int index);
-
 	void initModel();
 
 	int start();

@@ -12,6 +12,8 @@
 #include <Lmcons.h>
 #include <VersionHelpers.h>
 #include <time.h>
+#include "SnakeController.h"
+#include "SnakeWindowView.h"
 //we can't add a SingleLinkedList.cpp file and include that, because a template can't be instantiated at compile time, so the compiler can't access the implementation
 //anymore when creating an object
 #include "SingleLinkedList_impl.h"
@@ -175,16 +177,19 @@ int main(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 
 	int width = 38, height = 16;
 
-	//SnakeController* ctrl = new SnakeController();
+	SnakeController* ctrl = new SnakeController();
 	
-	//Snakemodel* model = new Snakemodel(width, height);
+	Snakemodel* model = new Snakemodel(width, height);
 
-	//SnakeWindowView* view = new SnakeWindowView(width, height, hInstance);
+	SnakeWindowView* view = new SnakeWindowView(width, height, hInstance, ctrl);
 
-	//ctrl->model=model;
-	//ctrl->view = view;
-	//ctrl->start();
-	while (true);
+	ctrl->model=model;
+	model->controller = ctrl;
+	ctrl->view = view;
+	ctrl->start();
+
+
+	
 	//while (model->getGameState()) {};
 
 	//model->lost();

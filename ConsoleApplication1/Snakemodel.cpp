@@ -7,7 +7,7 @@
 #define SNAKE_LEFT 3
 
 #define SNAKE_GROWTH_PER_FRUIT 2
-#define SNAKE_DEFAULTSPEED 300
+#define SNAKE_DEFAULTSPEED 3
 #define SNAKE_GAMESTATE_RUNNING 1
 #define SNAKE_GAMESTATE_PAUSED 2
 #define SNAKE_GAMESTATE_LOST 0
@@ -170,7 +170,7 @@ int Snakemodel::game()
 
 		//wir rechnen immer die Zeit zwischen aufrufen dazu, damit es nicht zu einer Zeitverschiebung wegen den ausgeführten Befehlen kommt
 		callMs += (std::chrono::milliseconds)this->speed;
-
+		this->printField();
 		std::this_thread::sleep_until(callMs);
 		dirMutex.lock();
 		this->step();
@@ -209,9 +209,11 @@ int Snakemodel::step()
 
 	this->crawlOne(listElem);
 
-	ret = *(*listElem)->element;
+	int ind = *(*listElem)->element;
+	ret = this->field[ind];
+	printf_s("VALUE: :%d",ret);
 	if (ret <= 0) {
-		controller->refreshIndex(ret);
+		controller->refreshIndex(ind);
 		this->body->removeAndFreeElem(0);
 	}
 
@@ -271,12 +273,13 @@ int Snakemodel::crawlOne(ListElem<int>** listElem)
 
 			controller->refreshIndex(this->generateNewFood());
 		}
-		this->illegalDirection = this->direction + 2 % 4;
+		this->illegalDirection = (this->direction + 2) % 4;
 		this->head = newIndex;
 
 		this->field[newIndex] = this->field[this->body->getLast()] + 1;
 		this->body->addBack(newIndex);
-		controller->refreshIndex(newIndex);
+
+		this->controller->view->refreshIndex(newIndex);
 	}
 
 
