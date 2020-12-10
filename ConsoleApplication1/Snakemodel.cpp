@@ -245,7 +245,7 @@ int Snakemodel::crawlOne(ListElem<int>** listElem)
 		break;
 	case SNAKE_LEFT:
 		newIndex = index - 1;
-		if (newIndex % this->WIDTH == this->WIDTH-1) newIndex += this->WIDTH;
+		if (newIndex % this->WIDTH == this->WIDTH-1 || newIndex <0) newIndex += this->WIDTH;
 		break;
 	default:
 		printf_s("ERROR! Illegal direction!  :   %d   \n", direction);
