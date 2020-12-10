@@ -174,9 +174,18 @@ int main(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 	+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 	+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 	*/
+	int width, height;
+	printf_s("Länge (10-40): ");
+	
+	scanf_s("%d", &width);
 
-	int width = 38, height = 16;
+	if (width < 10) width = 10;
+	if (width > 40) width = 40;
+	printf_s("Breite (10-30): ");
 
+	scanf_s("%d", &height);
+	if (height < 10) height = 10;
+	if (height > 30) height = 30;
 	SnakeController* ctrl = new SnakeController();
 	
 	Snakemodel* model = new Snakemodel(width, height);
