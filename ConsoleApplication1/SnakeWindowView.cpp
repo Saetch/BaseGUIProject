@@ -103,19 +103,15 @@ LRESULT CALLBACK SnakeWindowView::MainWndProc(HWND hwnd, UINT msg,
 
 		case 0x57: //W
 			cntrl->WKey();
-			printf_s("W");
 			break;
 		case 0x41: //A
 			cntrl->AKey();
-			printf_s("A");
 			break;
 		case 0x53: //S
 			cntrl->SKey();
-			printf_s("S");
 			break;
 		case 0x44: //D
 			cntrl->DKey();
-			printf_s("D");
 			break;
 		}
 
@@ -178,7 +174,19 @@ HWND* SnakeWindowView::initGrid()
 		lastUp += tileHeight;
 	}
 	
-	SetWindowPos(this->mainHandle, NULL, 100, 100, tileWidth*WIDTH, tileHeight*HEIGHT, NULL);
+	RECT rc1, rc2;
+	GetWindowRect(this->mainHandle, &rc1);
+	GetClientRect(this->mainHandle, &rc2);
+
+	int extratop = (rc1.bottom-rc2.bottom )- (rc1.top - rc2.top);
+	
+
+	SetWindowPos(this->mainHandle, NULL, 0, 0, tileWidth*(WIDTH), tileHeight*(HEIGHT)+extratop, NULL);
+	GetWindowRect(this->mainHandle, &rc1);
+	GetClientRect(this->mainHandle, &rc2);
+	int extrawidth = (rc1.right - rc2.right) - (rc2.left - rc.left);
+	SetWindowPos(this->mainHandle, NULL, 0, 0, tileWidth*(WIDTH)+extrawidth, tileHeight*(HEIGHT)+extratop, NULL);
+
 	CenterWindow(this->mainHandle);
 
 	return gridStart;

@@ -7,7 +7,7 @@
 #define SNAKE_LEFT 3
 
 #define SNAKE_GROWTH_PER_FRUIT 2
-#define SNAKE_DEFAULTSPEED 3
+#define SNAKE_DEFAULTSPEED 80
 #define SNAKE_GAMESTATE_RUNNING 1
 #define SNAKE_GAMESTATE_PAUSED 2
 #define SNAKE_GAMESTATE_LOST 0
@@ -170,11 +170,10 @@ int Snakemodel::game()
 
 		//wir rechnen immer die Zeit zwischen aufrufen dazu, damit es nicht zu einer Zeitverschiebung wegen den ausgeführten Befehlen kommt
 		callMs += (std::chrono::milliseconds)this->speed;
-		this->printField();
 		std::this_thread::sleep_until(callMs);
-		dirMutex.lock();
+	
 		this->step();
-		dirMutex.unlock();
+	
 	}
 
 
@@ -211,7 +210,6 @@ int Snakemodel::step()
 
 	int ind = *(*listElem)->element;
 	ret = this->field[ind];
-	printf_s("VALUE: :%d",ret);
 	if (ret <= 0) {
 		controller->refreshIndex(ind);
 		this->body->removeAndFreeElem(0);
@@ -231,7 +229,7 @@ int Snakemodel::crawlOne(ListElem<int>** listElem)
 {
 	const int index = this->body->getLast();
 	int newIndex;
-
+	dirMutex.lock();
 	switch (direction) {
 	case SNAKE_RIGHT:
 		newIndex = index + 1;
@@ -239,7 +237,7 @@ int Snakemodel::crawlOne(ListElem<int>** listElem)
 		break;
 	case SNAKE_UP:
 		newIndex = index - this->WIDTH;
-		if (newIndex % this->WIDTH == this->WIDTH - 1) newIndex += this->WIDTH;
+		if (newIndex < 0) newIndex += this->length;
 		break;
 	case SNAKE_DOWN:
 		newIndex = index + this->WIDTH;
@@ -247,17 +245,19 @@ int Snakemodel::crawlOne(ListElem<int>** listElem)
 		break;
 	case SNAKE_LEFT:
 		newIndex = index - 1;
-		if (newIndex < 0) newIndex += this->length;
+		if (newIndex % this->WIDTH == this->WIDTH-1) newIndex += this->WIDTH;
+		break;
 	default:
-		printf_s("ERROR! Illegal direction!\n");
+		printf_s("ERROR! Illegal direction!  :   %d   \n", direction);
 		return 1;
 	}
+	dirMutex.unlock();
 
 	ListElem<int>* curr = *listElem;
 
 
 	if (this->field[newIndex] > 0) {
-		//TODO	 losing
+		printf_s("TOTALLY LOST; LMAOOO\n");
 		this->gameState.store(SNAKE_GAMESTATE_LOST);
 	}
 	else {
@@ -273,7 +273,7 @@ int Snakemodel::crawlOne(ListElem<int>** listElem)
 
 			controller->refreshIndex(this->generateNewFood());
 		}
-		this->illegalDirection = (this->direction + 2) % 4;
+		this->illegalDirection.store( (this->direction + 2) % 4);
 		this->head = newIndex;
 
 		this->field[newIndex] = this->field[this->body->getLast()] + 1;
