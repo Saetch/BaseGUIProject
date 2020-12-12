@@ -21,8 +21,15 @@
 #pragma comment(lib, "user32.lib")
 //HEAD
 #define SHOW_UNNECESSARIES 0
+#define SKIP_GAME 0
 #define ID_HOTKEY 1
 
+
+#define MENU_FILE_NEW 1
+#define MENU_FILE_OPEN 2
+#define MENU_FILE_QUIT 3
+
+void AddMenus(HWND hwnd);
 void showFirstBox();
 int showSecondBoxDirectory();
 int showThirdBoxMemory();
@@ -83,142 +90,94 @@ int main(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 		printf_s("Debug here\n");
 		//system("pause") ist kein netter system-call, aber funktioniert hier erstmal, um User nach input zu fragen, bis man fort fährt
 		system("pause");
+	}
+	
+	if (!SKIP_GAME) {
+		//NUR IN DIESEM BONKER IST DER EIGENTLICHE CODE VOM EINSTIEGSPUNKT
+		/*+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+		+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+		+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+		+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+		+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+		+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+		+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+		+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+		+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+		+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+		+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+		*/
+		int width, height;
+		printf_s("Länge (10-40): ");
+
+		scanf_s("%d", &width);
+
+		if (width < 10) width = 10;
+		if (width > 40) width = 40;
+		printf_s("Breite (10-30): ");
+
+		scanf_s("%d", &height);
+		if (height < 10) height = 10;
+		if (height > 30) height = 30;
+		SnakeController* ctrl = new SnakeController();
+
+		Snakemodel* model = new Snakemodel(width, height);
+
+		SnakeWindowView* view = new SnakeWindowView(width, height, hInstance, ctrl);
+
+		ctrl->model = model;
+		model->controller = ctrl;
+		ctrl->view = view;
+		ctrl->start();
 
 
-		//variable, um Nachrichten zu holen
+
+		//while (model->getGameState()) {};
+
+		//model->lost();
+
+		//delete model;
+
+
+
+		/*+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+		+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+		+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+		+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+		+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+		+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+		+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+		+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+		+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+		+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+		+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+		*/
+	}
+	else {
 		MSG  msg;
-		//handle zum Fenster, das wir öffnen wollen
-		HWND hwnd;
-		//Fenster-Klasse. Hier kommt Konfiguration rein, damit windows weiß, wie wir das Fenster haben wollen
-		//davon können mehrere erstellt werden. Es ist NICHT ein Fenster, es ist die Vorlage für ein Fenster
-		WNDCLASSW wc;
-		//zeichne neu, wenn bewegt oder verändert
-		wc.style = CS_HREDRAW | CS_VREDRAW;
-		//Unterklassen-Values
-		wc.cbClsExtra = 0;
-		wc.cbWndExtra = 0;
-		//Name
-		wc.lpszClassName = L"Window";
-		//handle-Instanz, aus main
+		WNDCLASSW wc = { 0 };
+		wc.lpszClassName = L"Simple menu";
 		wc.hInstance = hInstance;
-		//Hintergrund-Färben
 		wc.hbrBackground = GetSysColorBrush(COLOR_3DFACE);
-		//kein Menü
-		wc.lpszMenuName = NULL;
-		//function-pointer für message-callback procedure = unsere unten definierte Function
 		wc.lpfnWndProc = WndProc;
-		//Mauszeiger auf default
-		wc.hCursor = LoadCursor(NULL, IDC_ARROW);
-		//Fenster Icon default
-		wc.hIcon = LoadIcon(NULL, IDI_APPLICATION);
-		//Fenster registrieren, damit das OS damit kommunizieren und es anzeigen kann
+		wc.hCursor = LoadCursor(0, IDC_ARROW);
+
 		RegisterClassW(&wc);
-		//Fenster erstellen mit Werten: wc.lpszClassName sorgt dafür, dass unsere Fenster-Vorlage benutzt wird, Referenz auf dieses Fenster
-		//wird dann in hwnd gespeichert (handle)
-		hwnd = CreateWindowW(wc.lpszClassName, L"Windows",
+		CreateWindowW(wc.lpszClassName, L"Simple menu",
 			WS_OVERLAPPEDWINDOW | WS_VISIBLE,
-			100, 100, 250, 180, 0, 0, hInstance, NULL);
+			100, 100, 350, 250, 0, 0, hInstance, 0);
 
-		RegisterRedPanelClass();
-
-		sub1 = CreateWindowW(L"RedPanelClass", NULL,
-			WS_CHILD | WS_VISIBLE,
-			//X
-			20,
-			//Y
-			20,
-			//width
-			80,
-			//height
-			80,
-			//window
-			hwnd,
-			//unique identifier for every child window
-			(HMENU)1,
-
-			NULL,
-
-			NULL);
-
-
-
-
-
-		RegisterBluePanelClass();
-
-		sub2 = CreateWindowW(L"BluePanelClass", NULL,
-			WS_CHILD | WS_VISIBLE,
-			120, 20, 80, 80,
-			hwnd, (HMENU)2, NULL, NULL);
-
-		//hole Nachricht für das Fenster aus dem Message-Buffer, das pausiert programmausführung, wenn Buffer leer
 		while (GetMessage(&msg, NULL, 0, 0)) {
+
 			TranslateMessage(&msg);
 			DispatchMessage(&msg);
 		}
-		(int)msg.wParam;
 
 	}
-	
-
-	//NUR IN DIESEM BONKER IST DER EIGENTLICHE CODE VOM EINSTIEGSPUNKT
-	/*+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-	+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-	+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-	+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-	+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-	+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-	+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-	+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-	+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-	+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-	+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-	*/
-	int width, height;
-	printf_s("Länge (10-40): ");
-	
-	scanf_s("%d", &width);
-
-	if (width < 10) width = 10;
-	if (width > 40) width = 40;
-	printf_s("Breite (10-30): ");
-
-	scanf_s("%d", &height);
-	if (height < 10) height = 10;
-	if (height > 30) height = 30;
-	SnakeController* ctrl = new SnakeController();
-	
-	Snakemodel* model = new Snakemodel(width, height);
-
-	SnakeWindowView* view = new SnakeWindowView(width, height, hInstance, ctrl);
-
-	ctrl->model=model;
-	model->controller = ctrl;
-	ctrl->view = view;
-	ctrl->start();
 
 
-	
-	//while (model->getGameState()) {};
-
-	//model->lost();
-
-	//delete model;
-	
 
 
-	/*+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-	+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-	+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-	+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-	+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-	+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-	+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-	+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-	+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-	+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-	+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-	*/
+
 
 	return 0;
 }
@@ -230,49 +189,54 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg,
 	WPARAM wParam, LPARAM lParam) {
 
 	switch (msg) {
-	case WM_KEYDOWN:
-
-		if (wParam == VK_ESCAPE) {
-
-			int ret = MessageBoxW(hwnd, L"Are you sure to quit?",
-				L"Message", MB_OKCANCEL);
-
-			if (ret == IDOK) {
-
-				SendMessage(hwnd, WM_CLOSE, 0, 0);
-			}
-		}
-
-		if (wParam == 0x46) //F
-		{
-			
-		}
-
-		break;
-	case WM_HOTKEY:
-		if (wParam == ID_HOTKEY) {
-			CenterWindow(hwnd);
-
-		}
-		break;
 
 	case WM_CREATE:
 
-		//STRG + C
-		//MOD_CONTROL == strg,   0x43 == c
-		//ID_HOTKEY ist die dieser Tastenkombination zugewiesene id, wird für Aufrufe benötigt
-		RegisterHotKey(hwnd, ID_HOTKEY, MOD_CONTROL, 0x43);
+		AddMenus(hwnd);
+		break;
+
+	case WM_COMMAND:
+
+		switch (LOWORD(wParam)) {
+
+		case MENU_FILE_NEW:
+		case MENU_FILE_OPEN:
+
+			MessageBeep(MB_ICONINFORMATION);
+			break;
+
+		case MENU_FILE_QUIT:
+
+			SendMessage(hwnd, WM_CLOSE, 0, 0);
+			break;
+		}
 
 		break;
+
 	case WM_DESTROY:
 
-		UnregisterHotKey(hwnd, ID_HOTKEY);
-		//ohne die PostQuitMessage-Funktion wird das Fenster trotzdem durch das Kreuz geschlossen, aber das Programm läuft nicht weiter
 		PostQuitMessage(0);
 		break;
 	}
-	//default Window Procedure
+
 	return DefWindowProcW(hwnd, msg, wParam, lParam);
+}
+
+void AddMenus(HWND hwnd) {
+
+	HMENU hMenubar;
+	HMENU hMenu;
+
+	hMenubar = CreateMenu();
+	hMenu = CreateMenu();
+
+	AppendMenuW(hMenu, MF_STRING, MENU_FILE_NEW, L"&New");
+	AppendMenuW(hMenu, MF_STRING, MENU_FILE_OPEN, L"&Open");
+	AppendMenuW(hMenu, MF_SEPARATOR, 0, NULL);
+	AppendMenuW(hMenu, MF_STRING, MENU_FILE_QUIT, L"&Quit"); //je ein Eintrag nach dem dropdown von file --> new -> Open -> - -> Quit
+	
+	AppendMenuW(hMenubar, MF_POPUP, (UINT_PTR)hMenu, L"&File"); //eine Zeile, für drop-down (POPUP)
+	SetMenu(hwnd, hMenubar);
 }
 
 

@@ -258,6 +258,8 @@ int Snakemodel::crawlOne(ListElem<int>** listElem)
 
 	if (this->field[newIndex] > 0) {
 		printf_s("TOTALLY LOST; LMAOOO\n");
+		this->printField();
+
 		this->gameState.store(SNAKE_GAMESTATE_LOST);
 	}
 	else {
