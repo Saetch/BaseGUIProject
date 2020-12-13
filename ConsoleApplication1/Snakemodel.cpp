@@ -222,6 +222,11 @@ int Snakemodel::step()
 	this->crawlOne(listElem);
 	int ind = *(*listElem)->element;
 	ret = this->field[ind];
+	if (this->body->get(0) == this->head) {
+		std::cout << "OOOF!";
+		this->body->removeAndFreeElem(0);
+		controller->refreshIndex(ind);
+	}
 	if (ret <= 0) {
 		controller->refreshIndex(ind);
 		this->body->removeAndFreeElem(0);
