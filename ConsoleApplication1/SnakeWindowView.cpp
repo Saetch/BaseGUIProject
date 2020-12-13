@@ -1,6 +1,7 @@
 #include "SnakeWindowView.h"
 #include "SnakeController.h"
-
+#include <Windows.h>
+#pragma comment(lib, "user32.lib")
 
 #define ID_HOTKEY 1
 #define FIELDPIXELMOD 30
@@ -69,7 +70,7 @@ HWND SnakeWindowView::mainWindow()
 	RegisterClassW(&wc);
 	//Fenster erstellen mit Werten: wc.lpszClassName sorgt dafür, dass unsere Fenster-Vorlage benutzt wird, Referenz auf dieses Fenster
 	//wird dann in hwnd gespeichert (handle)
-	hwnd = CreateWindowW(wc.lpszClassName, L"Windows",
+	hwnd = CreateWindow(wc.lpszClassName, L"Windows",
 		WS_OVERLAPPEDWINDOW | WS_VISIBLE,
 		100, 100, this->WIDTH*FIELDPIXELMOD, this->HEIGHT*FIELDPIXELMOD, 0, 0, hInstance, NULL);
 
@@ -164,9 +165,10 @@ HWND* SnakeWindowView::initGrid()
 				lastLeft, lastUp, tileWidth, tileHeight,
 				this->mainHandle, (HMENU)i, NULL, NULL);
 			//speichere Information in dem Handle der Windows
-			 index = GetWindowLongPtr(gridStart[i], GWL_USERDATA);
+			 index = GetWindowLongPtr(gridStart[i], GWLP_USERDATA);
 			 index = i;
-			 SetWindowLongPtr(gridStart[i], GWL_USERDATA, index);
+			 
+			 SetWindowLongPtr(gridStart[i], GWLP_USERDATA, index);
 			i++;
 			lastLeft += tileWidth;
 		}
@@ -235,7 +237,7 @@ LRESULT CALLBACK SnakeWindowView::GridTileProc(HWND hwnd, UINT msg, WPARAM wPara
 	case WM_ERASEBKGND:
 		 
 
-			index = GetWindowLongPtr(hwnd, GWL_USERDATA);
+			index = GetWindowLongPtr(hwnd, GWLP_USERDATA);
 
 
 			HPEN pen;

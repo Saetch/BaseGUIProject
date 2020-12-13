@@ -297,8 +297,7 @@ void Snakemodel::printField() {
 	for (int i = 0; i < this->HEIGHT; i++) {
 		ret += "[";
 		for (int j = 0; j < this->WIDTH; j++) {
-			ret += " " + std::to_string(this->field[i*WIDTH + j]);
-			ret += " ";
+			ret += "\t" + std::to_string(this->field[i*WIDTH + j]);
 		}
 		ret += "]\n";
 	}
