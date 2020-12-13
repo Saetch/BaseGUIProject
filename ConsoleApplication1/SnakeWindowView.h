@@ -4,7 +4,6 @@
 #include <sstream>
 #pragma comment(lib, "user32.lib")
 
-
 class SnakeController;
 
 class SnakeWindowView
@@ -15,14 +14,14 @@ public:
 	int refreshIndex(int index);
 private:
 	int length;
-
+	HDC* contextGrid;
 	HINSTANCE hInstance;
 
 
 	int WIDTH;
 	int HEIGHT;
 
-
+	
 	HWND mainHandle;
 	HWND* grid;
 	HWND mainWindow();
@@ -31,6 +30,7 @@ private:
 
 	void RegisterGridClass(void);
 
+	HDC* initContextGrid();
 	static LRESULT CALLBACK MainWndProc(HWND hwnd, UINT msg,
 		WPARAM wParam, LPARAM lParam);
 

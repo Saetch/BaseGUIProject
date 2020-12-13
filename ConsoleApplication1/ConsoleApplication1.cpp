@@ -118,7 +118,7 @@ int main(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 		scanf_s("%d", &height);
 		if (height < 10) height = 10;
 		if (height > 30) height = 30;
-		SnakeController* ctrl = new SnakeController();
+		SnakeController* ctrl = new SnakeController(width, height);
 
 		Snakemodel* model = new Snakemodel(width, height);
 

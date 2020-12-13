@@ -1,7 +1,9 @@
 #include "SnakeController.h"
 
-SnakeController::SnakeController()
+SnakeController::SnakeController(int w, int h)
 {
+	WIDTH = w;
+	HEIGHT = h;
 }
 
 SnakeController::~SnakeController()
@@ -58,7 +60,22 @@ void SnakeController::DKey()
 	this->model->turnRight();
 }
 
+void SnakeController::esc()
+{
+	delete model;
+}
+
 void SnakeController::spaceBar()
 {
-	this->model->pause();
+	Snakemodel* old = this->model;
+	this->model = new Snakemodel(WIDTH, HEIGHT);
+	this->model->controller = this;
+	delete old;
+	for (int i = 0; i < WIDTH * HEIGHT; i++) {
+		refreshIndex(i);
+	}
+	this->start();
+	
 }
+
+

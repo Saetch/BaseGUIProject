@@ -1,6 +1,7 @@
 #include "SnakeWindowView.h"
 #include "SnakeController.h"
 #include <Windows.h>
+#include <stdio.h>
 #pragma comment(lib, "user32.lib")
 
 #define ID_HOTKEY 1
@@ -14,7 +15,6 @@ SnakeWindowView::SnakeWindowView(int w, int h, HINSTANCE hInstance, SnakeControl
 {
 	WIDTH = w;
 	HEIGHT = h;
-
 	this->length = w * h;
 	this->hInstance = hInstance;
 
@@ -24,19 +24,20 @@ SnakeWindowView::SnakeWindowView(int w, int h, HINSTANCE hInstance, SnakeControl
 	this->mainHandle = mainWindow();
 	this->RegisterGridClass();
 	this->grid = initGrid();
+	this->contextGrid = initContextGrid();
 }
 
 
 SnakeWindowView::~SnakeWindowView()
 {
-
+	delete this->contextGrid;
 	delete this->grid;
 }
 
 
 int SnakeWindowView::refreshIndex(int index)
 {
-	SendMessage(this->grid[index],WM_ERASEBKGND, (UINT_PTR)GetWindowDC(this->grid[index]), NULL);
+	SendMessage(this->grid[index],WM_ERASEBKGND, (UINT_PTR)this->contextGrid[index], NULL);
 	return 0;
 }
 
@@ -81,6 +82,17 @@ HWND SnakeWindowView::mainWindow()
 
 
 
+HDC* SnakeWindowView::initContextGrid()
+{
+	HDC* retGrid = new HDC[WIDTH * HEIGHT];
+	for (int i = 0; i < WIDTH * HEIGHT; i++) {
+		retGrid[i] = GetWindowDC(this->grid[i]);
+	}
+
+
+	return retGrid;
+}
+
 LRESULT CALLBACK SnakeWindowView::MainWndProc(HWND hwnd, UINT msg,
 	WPARAM wParam, LPARAM lParam) {
 
@@ -94,24 +106,29 @@ LRESULT CALLBACK SnakeWindowView::MainWndProc(HWND hwnd, UINT msg,
 				L"Message", MB_OKCANCEL);
 
 			if (ret == IDOK) {
-
+				cntrl->esc();
 				SendMessage(hwnd, WM_CLOSE, 0, 0);
 			}
 			break;
 		case 0x46: 
 			//PAUSE -> F-key
 			break;
-
+		case VK_SPACE:
+			cntrl->spaceBar();
+		case VK_UP:
 		case 0x57: //W
 			cntrl->WKey();
 			break;
 		case 0x41: //A
+		case VK_LEFT:
 			cntrl->AKey();
 			break;
 		case 0x53: //S
+		case VK_DOWN:
 			cntrl->SKey();
 			break;
 		case 0x44: //D
+		case VK_RIGHT:
 			cntrl->DKey();
 			break;
 		}
@@ -224,57 +241,75 @@ void SnakeWindowView::RegisterGridClass(void) {
 }
 
 
+
 LRESULT CALLBACK SnakeWindowView::GridTileProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
 
 	static int val;
 	static long index;
+	static HPEN bkgrndPen = CreatePen(PS_SOLID, 10, RGB(120, 120, 120));
+	static HBRUSH bkgrndBrush = CreateSolidBrush(RGB(120, 120, 120));
+	static HPEN fruitPen = CreatePen(PS_SOLID, 10, RGB(249, 0, 0));
+	static HBRUSH fruitBrush = CreateSolidBrush(RGB(249, 0, 0));
+
+	static HPEN snakePen = CreatePen(PS_SOLID, 10, RGB(25, 25, 25));
+	static HBRUSH snakeBrush = CreateSolidBrush(RGB(25, 25, 25));
+
+	static HPEN headPen = CreatePen(PS_SOLID, 10, RGB(25, 180, 25));
+	static HBRUSH headBrush = CreateSolidBrush(RGB(25, 180, 25));
 	switch (msg) {
 
 	case WM_UPDATEMESSAGE:
 
 		break;
 	case WM_ERASEBKGND:
-		 
 
 			index = GetWindowLongPtr(hwnd, GWLP_USERDATA);
+			
 
-
-			HPEN pen;
-			HBRUSH	brush;
+			HPEN* pen;
+			HBRUSH*	brush;
 			RECT rect;
 			
 			val = cntrl->model->field[index];
 
 			switch (val) {
 			case 0:
-				pen = CreatePen(PS_SOLID, 1, RGB(120, 120, 120));
-				brush = CreateSolidBrush(RGB(120, 120, 120));
+				pen = &bkgrndPen;
+				brush = &bkgrndBrush;
 				break;
 			case -1:
-				pen = CreatePen(PS_SOLID, 1, RGB(249, 0, 0));
-				brush = CreateSolidBrush(RGB(230, 0, 0));
+				pen = &fruitPen;
+				brush = &fruitBrush;
 				break;
 			default:
-				pen = CreatePen(PS_SOLID, 1, RGB(25, 25, 25));
-				brush = CreateSolidBrush(RGB(25, 25, 25));
+				if (index == cntrl->model->head) {
+					pen = &headPen;
+					brush = &headBrush;
+				}
+				else {
+					pen = &snakePen;
+					brush = &snakeBrush;
+				}
+
+
 				break;
 			}
 
 			//packe diese beiden in den device Context, sie werden smart hinzugefügt und von SelectObject richtig eingesetzt
 			//wParam ist bei der WM_ERASEBKGND-Nachricht immer der device context, deshalb cast sicher
-			SelectObject((HDC)wParam, pen);
-			SelectObject((HDC)wParam, brush);
+			SelectObject((HDC)wParam, *pen);
+			SelectObject((HDC)wParam, *brush);
 			//hole das innere (nicht Window) Rectangle und speicher in rect
 			GetClientRect(hwnd, &rect);
 			//zeichne ein neues
 			Rectangle((HDC)wParam, rect.left, rect.top, rect.right, rect.bottom);
-
-			return (INT_PTR)brush;
+			
+			return 0;
 		
 
 		break;
-
+		
 	default:
 
 		return DefWindowProcW(hwnd, msg, wParam, lParam);

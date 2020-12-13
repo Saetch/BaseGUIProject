@@ -118,19 +118,18 @@ Snakemodel::Snakemodel(int width, int height)
 
 Snakemodel::~Snakemodel()
 {
-
+	this->lost();
 
 	while (this->body->getSize() > 0) {
 		this->body->removeAndFreeElem(0);
 	}
 	free(this->field);
 
-	this->gameState.store(SNAKE_GAMESTATE_LOST);
 
 
 
 	delete this->body;
-
+	
 
 }
 
@@ -155,7 +154,7 @@ int Snakemodel::generateNewFood()
 
 int Snakemodel::game()
 {
-	//printf_s("HELLO, THREAD STARTED\n");
+	printf_s("HELLO, THREAD STARTED\n");
 
 	auto callMs = (std::chrono::time_point_cast<std::chrono::milliseconds>)(std::chrono::steady_clock::now());
 
@@ -167,17 +166,15 @@ int Snakemodel::game()
 
 	//PS: bei jedem Datentyp über nano kommt es erst bei über 500 Jahren zu einem Overflow
 	while (this->gameState.load()) {
+		this->step();
 
 		//wir rechnen immer die Zeit zwischen aufrufen dazu, damit es nicht zu einer Zeitverschiebung wegen den ausgeführten Befehlen kommt
 		callMs += (std::chrono::milliseconds)this->speed;
 		std::this_thread::sleep_until(callMs);
 	
-		this->step();
-	
 	}
 
-
-
+	std::cout << "THREAD ENDED" << std::endl;
 	return 0;
 
 }
@@ -193,21 +190,22 @@ int Snakemodel::reduceOne(int* i) {
 
 int Snakemodel::step()
 {
-
 	int ret;
 
 	if (this->body->getSize() == 0) return 0;
 
 
-	static ListElem<int>** listElem = this->body->getElemP();  //Pointer to pointer, so it never changes
+	ListElem<int>** listElem = this->body->getElemP();  //Pointer to pointer, so it never changes
 	ListElem<int>* curr = *listElem; //firstElement
+	if (listElem == NULL) {
+		listElem = this->body->getElemP();
+		curr = *listElem;
+	}
 	for (int i = 0; i < this->body->getSize(); i++) {
 		this->field[*(curr->element)]--;
 		curr = curr->next;
 	}
-
 	this->crawlOne(listElem);
-
 	int ind = *(*listElem)->element;
 	ret = this->field[ind];
 	if (ret <= 0) {
@@ -221,8 +219,12 @@ int Snakemodel::step()
 
 
 
-
 	return 0;
+}
+
+int Snakemodel::headVal()
+{
+	return this->field[this->head];
 }
 
 int Snakemodel::crawlOne(ListElem<int>** listElem)
@@ -252,9 +254,8 @@ int Snakemodel::crawlOne(ListElem<int>** listElem)
 		return 1;
 	}
 	dirMutex.unlock();
-
 	ListElem<int>* curr = *listElem;
-
+	int oldIndex;
 
 	if (this->field[newIndex] > 0) {
 		printf_s("TOTALLY LOST; LMAOOO\n");
@@ -263,7 +264,6 @@ int Snakemodel::crawlOne(ListElem<int>** listElem)
 		this->gameState.store(SNAKE_GAMESTATE_LOST);
 	}
 	else {
-
 
 		//Frucht
 		if (this->field[newIndex] == -1) {
@@ -276,14 +276,23 @@ int Snakemodel::crawlOne(ListElem<int>** listElem)
 			controller->refreshIndex(this->generateNewFood());
 		}
 		this->illegalDirection.store( (this->direction + 2) % 4);
+
+		oldIndex = this->head;
 		this->head = newIndex;
 
 		this->field[newIndex] = this->field[this->body->getLast()] + 1;
+
 		this->body->addBack(newIndex);
 
-		this->controller->view->refreshIndex(newIndex);
-	}
 
+		if (this->gameState.load()) {
+		this->controller->view->refreshIndex(oldIndex);
+
+		this->controller->view->refreshIndex(newIndex);
+		}
+	
+
+	}
 
 
 

@@ -4,7 +4,7 @@
 class SnakeController
 {
 public:
-	SnakeController();
+	SnakeController(int w, int h);
 	~SnakeController();
 	Snakemodel* model;
 	SnakeWindowView* view;
@@ -18,6 +18,9 @@ public:
 	void AKey();
 	void SKey();
 	void DKey();
-
+	void esc();
 	void spaceBar();
+private: 
+	int WIDTH;
+	int HEIGHT;
 };

@@ -18,9 +18,12 @@ class SnakeController;
 class Snakemodel
 {
 public:
+	int head;
+
 	int* field;
 	BYTE direction;
 	SnakeController* controller;
+	int inline headVal();
 
 	SingleLinkedList<int>* body;
 
@@ -54,8 +57,8 @@ public:
 		return this->speed = newSpeed;
 	};
 	inline int lost() {
-		if (thr1 != NULL) thr1->join();
 		this->gameState.store(0);
+		if (thr1 != NULL) thr1->join();
 		return 0;
 	};
 
@@ -65,7 +68,6 @@ private:
 	int HEIGHT;
 	int speed;
 	int length;
-	int head;
 	int nextStep;
 	std::atomic<BYTE> gameState;
 	int generateNewFood();
