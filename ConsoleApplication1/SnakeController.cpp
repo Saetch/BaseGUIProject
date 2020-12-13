@@ -65,6 +65,16 @@ void SnakeController::esc()
 	delete model;
 }
 
+void SnakeController::left()
+{
+	this->model->changeDirLeft();
+}
+
+void SnakeController::right()
+{
+	this->model->changeDirRight();
+}
+
 void SnakeController::spaceBar()
 {
 	Snakemodel* old = this->model;

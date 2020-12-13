@@ -115,20 +115,24 @@ LRESULT CALLBACK SnakeWindowView::MainWndProc(HWND hwnd, UINT msg,
 			break;
 		case VK_SPACE:
 			cntrl->spaceBar();
-		case VK_UP:
+			break;
+		case VK_LEFT:
+			cntrl->left();
+			break;
+		case VK_RIGHT:
+			cntrl->right();
+			break;
 		case 0x57: //W
 			cntrl->WKey();
 			break;
 		case 0x41: //A
-		case VK_LEFT:
 			cntrl->AKey();
 			break;
 		case 0x53: //S
-		case VK_DOWN:
+
 			cntrl->SKey();
 			break;
 		case 0x44: //D
-		case VK_RIGHT:
 			cntrl->DKey();
 			break;
 		}

@@ -19,6 +19,8 @@ public:
 	void SKey();
 	void DKey();
 	void esc();
+	void left();
+	void right();
 	void spaceBar();
 private: 
 	int WIDTH;

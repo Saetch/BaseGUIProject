@@ -133,6 +133,20 @@ Snakemodel::~Snakemodel()
 
 }
 
+void Snakemodel::changeDirLeft()
+{
+	dirMutex.lock();
+	this->direction = (this->direction+3)%4;
+	dirMutex.unlock();
+}
+
+void Snakemodel::changeDirRight()
+{
+	dirMutex.lock();
+	this->direction = (this->direction+1)%4;
+	dirMutex.unlock();
+}
+
 
 
 

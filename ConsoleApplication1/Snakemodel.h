@@ -47,6 +47,9 @@ public:
 	Snakemodel(int width, int height);
 	~Snakemodel();
 
+	void changeDirLeft();
+	void changeDirRight();
+
 	inline int getGameState() {
 		return this->gameState.load();
 	}
